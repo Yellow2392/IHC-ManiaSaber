@@ -1079,6 +1079,10 @@
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Toolchain.Win-x86_64-Linux-x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Toolchain.Win-x86_64-Linux-x86_64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.XR.Oculus.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.XR.Oculus.Editor.dll</HintPath>
       <Private>False</Private>
@@ -1347,6 +1351,10 @@
       <HintPath>Library\ScriptAssemblies\Meta.WitAi.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Sysroot.Linux_x86_64">
+      <HintPath>Library\ScriptAssemblies\Unity.Sysroot.Linux_x86_64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Oculus.Haptics">
       <HintPath>Library\ScriptAssemblies\Oculus.Haptics.dll</HintPath>
       <Private>False</Private>
@@ -1453,6 +1461,10 @@
     </Reference>
     <Reference Include="Oculus.Interaction.Editor">
       <HintPath>Library\ScriptAssemblies\Oculus.Interaction.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.SysrootPackage.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.SysrootPackage.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
