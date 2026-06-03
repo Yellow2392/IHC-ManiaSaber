@@ -15,11 +15,11 @@ EditorBuildSettings:
     path: Assets/Scenes/MenuPrincipal.unity
     guid: aca63f1c00c64c2479a5829ce51dc40f
   - enabled: 1
-    path: Assets/Scenes/MenuCanciones.unity
-    guid: a302cb4f64de9c54c9b41dd9c6ac9e4b
+    path: Assets/Scenes/GameScene.unity
+    guid: 60b402d99141c3846af17cdf13e7562a
   - enabled: 1
-    path: Assets/IRONHEAD Games/Scenes/GameScene.unity
-    guid: 8b0418fd49eb1d24fa8f70f9bf0642dd
+    path: Assets/Scenes/MenuSongs.unity
+    guid: 49f2dc79a198ebe45a9639ff2872767b
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: c96e23c4da5eca643be275d26e0f97c1, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 02bb88675a28e3841b57b4db7be14f4c, type: 2}

@@ -1334,10 +1334,7 @@ MonoBehaviour:
   - {fileID: 2003897386}
   - {fileID: 293038737}
   Cubeprefabs:
-  - {fileID: 9220460230358506278, guid: f1044f83bc9ee9145b22f20847ceb742, type: 3}
   - {fileID: 784917196415359683, guid: b33d44cc0102bbb4db363d552a024fa0, type: 3}
-  audioSource: {fileID: 1005023593}
-  mapaOsu: {fileID: 4900000, guid: bb0934ffe69d4864ca36b288ec7e6c73, type: 3}
   approachTime: 2
 --- !u!4 &1005023592
 Transform:
