@@ -1,6 +1,6 @@
-﻿using ICSharpCode.SharpZipBase.Zip; // Usamos la nueva librería ultra-compatible
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
+using System.IO.Compression; // Usamos la librería nativa ultra-compatible para Android/Meta Quest
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,7 +24,7 @@ public class GameSceneManager : MonoBehaviour
 
         if (string.IsNullOrEmpty(cancionElegida))
         {
-            Debug.LogWarning("No se detectó ninguna canción seleccionada en el menú.");
+            Debug.LogError("[GameSceneManager] ERROR: No se detectó ninguna canción seleccionada en SongMenuManager.CancionSeleccionada.");
             return;
         }
 
@@ -34,41 +34,41 @@ public class GameSceneManager : MonoBehaviour
     IEnumerator ProcesarZipYJugar(string nombreZip)
     {
         string rutaArchivoZip = Path.Combine(Application.dataPath, $"Resources/MusicFiles/ZipFiles/{nombreZip}.zip");
+        Debug.Log($"[GameSceneManager] Intentando buscar el archivo ZIP en: {rutaArchivoZip}");
 
         if (!File.Exists(rutaArchivoZip))
         {
-            Debug.LogError($"No se encontró el archivo ZIP en la ruta: {rutaArchivoZip}");
+            Debug.LogError($"[GameSceneManager] ERROR: No existe el archivo ZIP en la ruta especificada: {rutaArchivoZip}");
             yield break;
         }
 
         string contenidoOsu = "";
         byte[] audioBytes = null;
-        string nombreArchivoAudio = "music.mp3"; // Nombre por defecto por si acaso
+        string nombreArchivoAudio = "music.mp3";
 
         string mapaRespaldoTexto = "";
         long menorPesoOsu = long.MaxValue;
 
-        Debug.Log($"=== [SHARPZIPLIB] Abriendo con éxito: {nombreZip}.zip ===");
+        Debug.Log($"[GameSceneManager] ¡ZIP Encontrado! Abriendo con System.IO.Compression: {nombreZip}.zip");
 
-        // Abrimos el archivo usando la nueva librería tolerante a fallos
         using (FileStream fs = File.OpenRead(rutaArchivoZip))
         {
-            using (ZipFile zipFile = new ZipFile(fs))
+            using (ZipArchive zipFile = new ZipArchive(fs, ZipArchiveMode.Read))
             {
-                Debug.Log($"Archivos internos totales en el ZIP: {zipFile.Count}");
+                Debug.Log($"[GameSceneManager] Archivos internos totales localizados en el ZIP: {zipFile.Entries.Count}");
 
-                foreach (ZipEntry entrada in zipFile)
+                foreach (ZipArchiveEntry entrada in zipFile.Entries)
                 {
-                    if (!entrada.IsFile) continue; // Ignorar carpetas vacías
+                    if (entrada.FullName.EndsWith("/") || entrada.FullName.EndsWith("\\")) continue;
 
                     string nombreLimpio = entrada.Name;
-                    Debug.Log($"-> Archivo detectado dentro del ZIP: '{nombreLimpio}' ({entrada.Size} bytes)");
+                    Debug.Log($"[GameSceneManager] Archivo dentro del ZIP detectado: '{nombreLimpio}' ({entrada.Length} bytes)");
 
                     // 1. PROCESAR ARCHIVOS .OSU
                     if (nombreLimpio.EndsWith(".osu", System.StringComparison.OrdinalIgnoreCase))
                     {
                         string textoExtraido = "";
-                        using (Stream zipStream = zipFile.GetInputStream(entrada))
+                        using (Stream zipStream = entrada.Open())
                         {
                             using (StreamReader reader = new StreamReader(zipStream, System.Text.Encoding.UTF8))
                             {
@@ -76,16 +76,14 @@ public class GameSceneManager : MonoBehaviour
                             }
                         }
 
-                        // Si es el mapa Beginner, lo elegimos de inmediato y rompemos la búsqueda de mapas
                         if (nombreLimpio.ToUpper().Contains("[BEGINNER]"))
                         {
                             contenidoOsu = textoExtraido;
-                            Debug.Log($"¡Dificultad prioritaria [BEGINNER] encontrada e indexada!: {nombreLimpio}");
+                            Debug.Log($"[GameSceneManager] -> Dificultad prioritaria [BEGINNER] encontrada: {nombreLimpio}");
                         }
-                        // Si no es beginner, calculamos su peso para el respaldo
-                        else if (entrada.Size < menorPesoOsu && entrada.Size > 0)
+                        else if (entrada.Length < menorPesoOsu && entrada.Length > 0)
                         {
-                            menorPesoOsu = entrada.Size;
+                            menorPesoOsu = entrada.Length;
                             mapaRespaldoTexto = textoExtraido;
                         }
                     }
@@ -93,10 +91,9 @@ public class GameSceneManager : MonoBehaviour
                     // 2. PROCESAR ARCHIVO .MP3
                     if (nombreLimpio.EndsWith(".mp3", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        // Extraemos el nombre real del archivo sin importar si viene con ruta de carpeta de Windows
                         nombreArchivoAudio = Path.GetFileName(nombreLimpio);
 
-                        using (Stream zipStream = zipFile.GetInputStream(entrada))
+                        using (Stream zipStream = entrada.Open())
                         {
                             using (MemoryStream audioMs = new MemoryStream())
                             {
@@ -104,17 +101,16 @@ public class GameSceneManager : MonoBehaviour
                                 audioBytes = audioMs.ToArray();
                             }
                         }
-                        Debug.Log($"¡Audio .mp3 extraído correctamente en memoria!: {nombreLimpio}");
+                        Debug.Log($"[GameSceneManager] -> Audio .mp3 extraído con éxito en memoria temporal: {nombreLimpio}");
                     }
                 }
             }
         }
 
-        // Si terminó el escaneo y no encontramos un "[BEGINNER]", aplicamos el mapa más liviano que guardamos
         if (string.IsNullOrEmpty(contenidoOsu) && !string.IsNullOrEmpty(mapaRespaldoTexto))
         {
             contenidoOsu = mapaRespaldoTexto;
-            Debug.LogWarning("No se encontró mapa '[BEGINNER]'. Se aplicó el mapa .osu de respaldo (el de menor peso).");
+            Debug.LogWarning("[GameSceneManager] No se encontró mapa '[BEGINNER]'. Se aplicará el mapa .osu de respaldo por peso menor.");
         }
 
         // ENVIAR NOTAS AL SPAWNER
@@ -123,17 +119,17 @@ public class GameSceneManager : MonoBehaviour
             CubeSpawnManager spawner = cubeSpawnManager.GetComponent<CubeSpawnManager>();
             if (spawner != null)
             {
-                Debug.Log($"Enviando texto del .osu al CubeSpawnManager. Longitud del string: {contenidoOsu.Length}");
+                Debug.Log($"[GameSceneManager] Enviando texto del .osu al CubeSpawnManager. Longitud del string: {contenidoOsu.Length} caracteres.");
                 spawner.InicializarMapaDesdeTexto(contenidoOsu);
             }
             else
             {
-                Debug.LogError("No se encontró el script CubeSpawnManager en la escena.");
+                Debug.LogError("[GameSceneManager] ERROR CRÍTICO: El objeto 'cubeSpawnManager' asignado no contiene el componente 'CubeSpawnManager'.");
             }
         }
         else
         {
-            Debug.LogError("ERROR CRÍTICO: No se encontró ningún archivo .osu válido dentro del ZIP.");
+            Debug.LogError("[GameSceneManager] ERROR CRÍTICO: El string final 'contenidoOsu' está completamente vacío. El ZIP no tiene archivos .osu válidos.");
         }
 
         // CARGAR EL AUDIO MP3 EN UNITY
@@ -150,26 +146,27 @@ public class GameSceneManager : MonoBehaviour
                 {
                     AudioClip clipDeMusica = DownloadHandlerAudioClip.GetContent(multimediaRequest);
                     AudioManager.instance.musicTheme.clip = clipDeMusica;
+                    Debug.Log("[GameSceneManager] Audio cargado con éxito en el AudioManager global.");
 
                     if (File.Exists(rutaTemporal)) File.Delete(rutaTemporal);
                 }
                 else
                 {
-                    Debug.LogError("Error al cargar el clip de audio en Unity: " + multimediaRequest.error);
+                    Debug.LogError("[GameSceneManager] Error de red/multimedia al cargar el clip de audio: " + multimediaRequest.error);
                 }
             }
         }
         else
         {
-            Debug.LogError("No se encontraron bytes de audio .mp3 válidos.");
+            Debug.LogError("[GameSceneManager] ERROR: No se pudieron extraer bytes del archivo de audio .mp3.");
         }
 
-        // ARRANCAR EL JUEGO Y LA MÚSICA
         if (AudioManager.instance.musicTheme.clip != null)
         {
             AudioManager.instance.musicTheme.Play();
             audioClipLength = AudioManager.instance.musicTheme.clip.length;
             StartCoroutine(StartCountdown(audioClipLength));
+            Debug.Log("[GameSceneManager] ¡Música iniciada! Arrancando Countdown del gameplay.");
         }
 
         progressBarImage.fillAmount = 0f;
@@ -193,6 +190,7 @@ public class GameSceneManager : MonoBehaviour
 
     public void GameOver()
     {
+        Debug.Log("[GameSceneManager] Fin de la canción alcanzado (GameOver).");
         cubeSpawnManager.SetActive(false);
         timerUI_Gameobject.SetActive(false);
     }

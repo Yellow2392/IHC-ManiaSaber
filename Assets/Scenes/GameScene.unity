@@ -1325,7 +1325,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1005023590}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0973561d47a73fb48be2ada9183fcb3a, type: 3}
+  m_Script: {fileID: 11500000, guid: 6af35af8f2b8c914fb235d7434876825, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Spawnpoints:
@@ -1335,7 +1335,7 @@ MonoBehaviour:
   - {fileID: 293038737}
   Cubeprefabs:
   - {fileID: 784917196415359683, guid: b33d44cc0102bbb4db363d552a024fa0, type: 3}
-  approachTime: 2
+  approachTime: 2.221
 --- !u!4 &1005023592
 Transform:
   m_ObjectHideFlags: 0
