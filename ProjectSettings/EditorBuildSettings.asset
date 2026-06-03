@@ -9,13 +9,13 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
-    path: Assets/OVRCameraRigScene.unity
+    path: Assets/Scenes/OVRCameraRigScene.unity
     guid: 9e5ed350ff321a746b18ee8dae2d1117
   - enabled: 1
-    path: Assets/MenuPrincipal.unity
+    path: Assets/Scenes/MenuPrincipal.unity
     guid: aca63f1c00c64c2479a5829ce51dc40f
   - enabled: 1
-    path: Assets/MenuCanciones.unity
+    path: Assets/Scenes/MenuCanciones.unity
     guid: a302cb4f64de9c54c9b41dd9c6ac9e4b
   - enabled: 1
     path: Assets/IRONHEAD Games/Scenes/GameScene.unity
