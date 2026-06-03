@@ -2,18 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
-using TMPro; // Quita esto si usas el Text clásico de Unity
+using TMPro;
 
 public class SongMenuManager : MonoBehaviour
 {
     [Header("Configuración de UI")]
-    public Transform contenedorBotones; // El objeto con Vertical Layout Group
-    public GameObject prefabBotón;      // Tu prefab de botón de canción
+    public Transform contenedorBotones;
+    public GameObject prefabBotón;
 
     [Header("Configuración de Escena")]
     public string nombreEscenaJuego = "GameScene";
 
-    // Variable estática para que la escena de juego sepa qué canción se eligió
     public static string CancionSeleccionada { get; private set; }
 
     void Start()
@@ -23,30 +22,38 @@ public class SongMenuManager : MonoBehaviour
 
     void GenerarListaCanciones()
     {
-        // Limpiamos el contenedor por si acaso hay botones viejos de prueba
+        // 1. Limpiar el contenedor
         foreach (Transform hijo in contenedorBotones)
         {
             Destroy(hijo.gameObject);
         }
 
-        // Buscamos todos los archivos de texto en Assets/Resources/MusicFiles/TextFiles
-        // Nota: Unity no necesita la extensión (.txt) al usar Resources.LoadAll
-        TextAsset[] archivosTexto = Resources.LoadAll<TextAsset>("MusicFiles/TextFiles");
+        // 2. Definimos la ruta real en el disco duro dentro de tu proyecto
+        string rutaCarpeta = Path.Combine(Application.dataPath, "Resources/MusicFiles/ZipFiles");
 
-        if (archivosTexto.Length == 0)
+        if (!Directory.Exists(rutaCarpeta))
         {
-            Debug.LogWarning("No se encontraron canciones en Resources/MusicFiles/TextFiles");
+            Debug.LogError($"La carpeta no existe en la ruta: {rutaCarpeta}. Asegúrate de crear las carpetas dentro de Assets.");
             return;
         }
 
-        foreach (TextAsset archivo in archivosTexto)
-        {
-            string nombreCancion = archivo.name; // Ej: "Song1"
+        // 3. Buscamos TODOS los archivos que terminen estrictamente en .zip
+        string[] archivosZip = Directory.GetFiles(rutaCarpeta, "*.zip");
 
-            // Instanciar el botón en el contenedor
+        if (archivosZip.Length == 0)
+        {
+            Debug.LogWarning("No se encontró ningún archivo .zip en la carpeta MusicFiles/ZipFiles");
+            return;
+        }
+
+        foreach (string rutaCompleta in archivosZip)
+        {
+            // Extrae solo el nombre (ej: de "C:/.../Thriller.zip" a "Thriller")
+            string nombreCancion = Path.GetFileNameWithoutExtension(rutaCompleta);
+
+            // 4. Crear el botón
             GameObject nuevoBoton = Instantiate(prefabBotón, contenedorBotones);
 
-            // Cambiar el texto del botón (Soporta TextMeshPro)
             TMP_Text textoBoton = nuevoBoton.GetComponentInChildren<TMP_Text>();
             if (textoBoton != null)
             {
@@ -54,11 +61,9 @@ public class SongMenuManager : MonoBehaviour
             }
             else
             {
-                // Por si usas el Text antiguo de Unity
                 nuevoBoton.GetComponentInChildren<Text>().text = nombreCancion;
             }
 
-            // Asignar la función del Click dinámicamente
             Button componenteBoton = nuevoBoton.GetComponent<Button>();
             componenteBoton.onClick.AddListener(() => SeleccionarCancion(nombreCancion));
         }
@@ -66,11 +71,8 @@ public class SongMenuManager : MonoBehaviour
 
     void SeleccionarCancion(string nombre)
     {
-        // Guardamos el nombre en la variable estática
         CancionSeleccionada = nombre;
-        Debug.Log("Canción seleccionada: " + CancionSeleccionada);
-
-        // Cargamos la escena de juego
+        Debug.Log("Canción ZIP seleccionada: " + CancionSeleccionada);
         SceneManager.LoadScene(nombreEscenaJuego);
     }
 }

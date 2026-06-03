@@ -78,10 +78,10 @@
     <Compile Include="Assets\Scripts\IRONHEAD\ButtonPushClick.cs" />
     <Compile Include="Assets\Scripts\GameSceneManager.cs" />
     <Compile Include="Assets\Scripts\IRONHEAD\CubeMovement.cs" />
+    <Compile Include="Assets\Scripts\CubeSpawnManager.cs" />
     <Compile Include="Assets\Scripts\IRONHEAD\SliceTest.cs" />
     <Compile Include="Assets\ezy-slice-master\EzySlice\Framework\IntersectionResult.cs" />
     <Compile Include="Assets\Scripts\IRONHEAD\Shooting.cs" />
-    <Compile Include="Assets\Scripts\IRONHEAD\CubeSpawnManager.cs" />
     <Compile Include="Assets\Scripts\DoorController.cs" />
     <Compile Include="Assets\Scripts\SongMenuManager.cs" />
     <Compile Include="Assets\Suggo Creations\RETROWAVE SKIES Lite\Scripts\GetGlobalMatrixLite.cs" />
@@ -98,9 +98,7 @@
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\Fantasy Skybox FREE\Readme.txt" />
-    <None Include="Assets\Resources\MusicFiles\TextFiles\song3_test.txt" />
     <None Include="Assets\Fantasy Skybox FREE\ReleaseNotes.txt" />
-    <None Include="Assets\Resources\MusicFiles\TextFiles\NewJeans - Super Shy (Robeats) [anatha&apos;s Easy].txt" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\Shaders\IRONHEAD\EnvironmentFX.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
@@ -108,7 +106,6 @@
     <None Include="Assets\Shaders\IRONHEAD\CyberCube.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\Resources\MusicFiles\TextFiles\song2_test.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Suggo Creations\RETROWAVE SKIES Lite\Shaders\Includes\MainLight.hlsl" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
@@ -116,7 +113,6 @@
     <None Include="Assets\Shaders\IRONHEAD\EnvironmentLights.shader" />
     <None Include="Assets\Shaders\IRONHEAD\CubeSliceFX.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\Resources\MusicFiles\TextFiles\song1_test.txt" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
