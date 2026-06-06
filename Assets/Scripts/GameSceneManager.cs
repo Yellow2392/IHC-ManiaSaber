@@ -44,7 +44,8 @@ public class GameSceneManager : MonoBehaviour
 
         string contenidoOsu = "";
         byte[] audioBytes = null;
-        string nombreArchivoAudio = "music.mp3";
+        string nombreArchivoAudio = "";
+        AudioType tipoDeAudio = AudioType.UNKNOWN; // Se asignará dinámicamente
 
         string mapaRespaldoTexto = "";
         long menorPesoOsu = long.MaxValue;
@@ -88,10 +89,15 @@ public class GameSceneManager : MonoBehaviour
                         }
                     }
 
-                    // 2. PROCESAR ARCHIVO .MP3
-                    if (nombreLimpio.EndsWith(".mp3", System.StringComparison.OrdinalIgnoreCase))
+                    // 2. PROCESAR ARCHIVO DE AUDIO (audio.mp3 o audio.ogg)
+                    string nombreSinExtension = Path.GetFileNameWithoutExtension(nombreLimpio);
+                    string extension = Path.GetExtension(nombreLimpio).ToLower();
+
+                    if (nombreSinExtension.Equals("audio", System.StringComparison.OrdinalIgnoreCase) &&
+                        (extension == ".mp3" || extension == ".ogg"))
                     {
-                        nombreArchivoAudio = Path.GetFileName(nombreLimpio);
+                        nombreArchivoAudio = nombreLimpio;
+                        tipoDeAudio = (extension == ".mp3") ? AudioType.MPEG : AudioType.OGGVORBIS;
 
                         using (Stream zipStream = entrada.Open())
                         {
@@ -101,7 +107,7 @@ public class GameSceneManager : MonoBehaviour
                                 audioBytes = audioMs.ToArray();
                             }
                         }
-                        Debug.Log($"[GameSceneManager] -> Audio .mp3 extraído con éxito en memoria temporal: {nombreLimpio}");
+                        Debug.Log($"[GameSceneManager] -> Audio detectado y extraído ({extension.ToUpper()}): {nombreLimpio}");
                     }
                 }
             }
@@ -132,13 +138,13 @@ public class GameSceneManager : MonoBehaviour
             Debug.LogError("[GameSceneManager] ERROR CRÍTICO: El string final 'contenidoOsu' está completamente vacío. El ZIP no tiene archivos .osu válidos.");
         }
 
-        // CARGAR EL AUDIO MP3 EN UNITY
-        if (audioBytes != null)
+        // CARGAR EL AUDIO DINÁMICO EN UNITY
+        if (audioBytes != null && tipoDeAudio != AudioType.UNKNOWN)
         {
             string rutaTemporal = Path.Combine(Application.temporaryCachePath, nombreArchivoAudio);
             File.WriteAllBytes(rutaTemporal, audioBytes);
 
-            using (UnityWebRequest multimediaRequest = UnityWebRequestMultimedia.GetAudioClip("file://" + rutaTemporal, AudioType.MPEG))
+            using (UnityWebRequest multimediaRequest = UnityWebRequestMultimedia.GetAudioClip("file://" + rutaTemporal, tipoDeAudio))
             {
                 yield return multimediaRequest.SendWebRequest();
 
@@ -146,7 +152,7 @@ public class GameSceneManager : MonoBehaviour
                 {
                     AudioClip clipDeMusica = DownloadHandlerAudioClip.GetContent(multimediaRequest);
                     AudioManager.instance.musicTheme.clip = clipDeMusica;
-                    Debug.Log("[GameSceneManager] Audio cargado con éxito en el AudioManager global.");
+                    Debug.Log($"[GameSceneManager] Audio ({tipoDeAudio}) cargado con éxito en el AudioManager global.");
 
                     if (File.Exists(rutaTemporal)) File.Delete(rutaTemporal);
                 }
@@ -158,7 +164,7 @@ public class GameSceneManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[GameSceneManager] ERROR: No se pudieron extraer bytes del archivo de audio .mp3.");
+            Debug.LogError("[GameSceneManager] ERROR: No se encontró un archivo válido 'audio.mp3' o 'audio.ogg' dentro del ZIP.");
         }
 
         if (AudioManager.instance.musicTheme.clip != null)
