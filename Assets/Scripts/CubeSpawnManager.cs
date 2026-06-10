@@ -17,7 +17,7 @@ public class CubeSpawnManager : MonoBehaviour
     [Tooltip("Silencio antes de que inicie la canción. Debe ser mayor que approachTime para que los primeros cubos se vean venir.")]
     public float leadInDelay = 3.5f;      // Tiempo de preparación antes de que empiece la música
 
-    public struct NotaOsu
+    public struct NotaOsu   
     {
         public int carril;
         public float tiempoGolpe;
