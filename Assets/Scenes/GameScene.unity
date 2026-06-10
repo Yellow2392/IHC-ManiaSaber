@@ -1336,6 +1336,7 @@ MonoBehaviour:
   Cubeprefabs:
   - {fileID: 784917196415359683, guid: b33d44cc0102bbb4db363d552a024fa0, type: 3}
   approachTime: 2.221
+  leadInDelay: 3.5
 --- !u!4 &1005023592
 Transform:
   m_ObjectHideFlags: 0
@@ -1365,19 +1366,19 @@ AudioSource:
   m_GameObject: {fileID: 1005023590}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2530308391009687683, guid: cda743a3b115ddd4d916382fffc75db6, type: 2}
   m_audioClip: {fileID: 8300000, guid: 71fd9aa37dd1e4a4a8cd622f0a8e5e38, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
-  Spatialize: 0
+  Spatialize: 1
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -1412,7 +1413,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.35
       inSlope: 0
       outSlope: 0
       tangentMode: 0
