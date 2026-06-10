@@ -1,15 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
+
 public class AudioManager : MonoBehaviour
 {
-
     public AudioSource sliceSound;
     public AudioSource gunSound;
     public AudioSource musicTheme;
     public AudioSource buttonClickSound;
-
 
     public static AudioManager instance;
 
@@ -22,7 +18,6 @@ public class AudioManager : MonoBehaviour
         }
 
         instance = this;
+        DontDestroyOnLoad(this.gameObject); // Asegura que persista entre menús y el GameScene
     }
-
-   
 }

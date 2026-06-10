@@ -7,7 +7,7 @@ public class ScoreManager : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI scoreText;
-    
+
     private int puntajeActual = 0;
 
     void Awake()

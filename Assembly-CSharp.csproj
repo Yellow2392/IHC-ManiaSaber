@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\NotUsing\GeneradorPiramide.cs" />
     <Compile Include="Assets\ezy-slice-master\EzySlice\Framework\Plane.cs" />
     <Compile Include="Assets\Suggo Creations\RETROWAVE SKIES Lite\Readme Assets\Scripts\ReadmeLite.cs" />
+    <Compile Include="Assets\Scripts\Test.cs" />
     <Compile Include="Assets\Scripts\NotUsing\DoorController.cs" />
   </ItemGroup>
   <ItemGroup>
