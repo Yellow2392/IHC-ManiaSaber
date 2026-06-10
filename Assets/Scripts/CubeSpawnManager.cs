@@ -10,6 +10,10 @@ public class CubeSpawnManager : MonoBehaviour
     [Header("Configuración de Ritmo")]
     public float approachTime = 2.221f;   // Segundos que tarda un cubo en llegar al punto de golpeo
 
+    [Header("Configuración de Movimiento")]
+    [Tooltip("Offset desde el Spawnpoint hasta el punto de golpeo (ej. (0,0,-10) si los cubos avanzan hacia atrás)")]
+    public Vector3 hitPointOffset = new Vector3(0, -0.1f, -2f);  // Ajusta según tu escena
+
     [Tooltip("Silencio antes de que inicie la canción. Debe ser mayor que approachTime para que los primeros cubos se vean venir.")]
     public float leadInDelay = 3.5f;      // Tiempo de preparación antes de que empiece la música
 
@@ -189,20 +193,39 @@ public class CubeSpawnManager : MonoBehaviour
 
     void SpawnearCubo(NotaOsu nota)
     {
+        // Validaciones
         if (nota.tipoCubo < 0 || nota.tipoCubo >= Cubeprefabs.Length || Spawnpoints.Length <= nota.carril)
             return;
 
         if (Spawnpoints[nota.carril] == null) return;
 
+        // Instanciar el prefab correcto (A o B)
         GameObject cube = Instantiate(Cubeprefabs[nota.tipoCubo], Spawnpoints[nota.carril].transform.position, Quaternion.identity);
         cube.transform.SetParent(transform);
 
-        // Pasamos información al cubo para el cálculo de precisión
+        // 1. Asignar datos al script CubeHit (para el golpeo y puntuación)
         CubeHit cubeHit = cube.GetComponent<CubeHit>();
         if (cubeHit != null)
         {
             cubeHit.tiempoGolpeExacto = nota.tiempoGolpe;
             cubeHit.tipoCuboAsignado = nota.tipoCubo;
+        }
+        else
+        {
+            Debug.LogWarning("[CubeSpawnManager] El prefab no tiene script CubeHit.");
+        }
+
+        // 2. Asignar datos al script CubeMovement (para movimiento sincronizado)
+        CubeMovement cubeMovement = cube.GetComponent<CubeMovement>();
+        if (cubeMovement != null)
+        {
+            cubeMovement.approachTime = this.approachTime;
+            // Calcula la posición exacta donde debe estar en el momento del golpe
+            cubeMovement.targetPosition = Spawnpoints[nota.carril].transform.position + hitPointOffset;
+        }
+        else
+        {
+            Debug.LogWarning("[CubeSpawnManager] El prefab no tiene script CubeMovement.");
         }
     }
 }
