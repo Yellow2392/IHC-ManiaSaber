@@ -169,10 +169,8 @@ public class GameSceneManager : MonoBehaviour
 
         if (AudioManager.instance.musicTheme.clip != null)
         {
-            AudioManager.instance.musicTheme.Play();
             audioClipLength = AudioManager.instance.musicTheme.clip.length;
             StartCoroutine(StartCountdown(audioClipLength));
-            Debug.Log("[GameSceneManager] ¡Música iniciada! Arrancando Countdown del gameplay.");
         }
 
         progressBarImage.fillAmount = 0f;
