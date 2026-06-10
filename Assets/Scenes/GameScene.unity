@@ -2103,8 +2103,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1442044316}
-  - component: {fileID: 1442044315}
   - component: {fileID: 1442044317}
+  - component: {fileID: 1442044318}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -2112,22 +2112,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1442044315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1442044314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b539a71ab2b12444485b265e1f6e6589, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sliceSound: {fileID: 3819278}
-  gunSound: {fileID: 0}
-  musicTheme: {fileID: 1442044317}
-  buttonClickSound: {fileID: 0}
 --- !u!4 &1442044316
 Transform:
   m_ObjectHideFlags: 0
@@ -2241,6 +2225,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1442044318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442044314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f2f31ee954299f4186d06f62fce1577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sliceSound: {fileID: 0}
+  gunSound: {fileID: 0}
+  musicTheme: {fileID: 0}
+  buttonClickSound: {fileID: 0}
 --- !u!1001 &1492665836
 PrefabInstance:
   m_ObjectHideFlags: 0
