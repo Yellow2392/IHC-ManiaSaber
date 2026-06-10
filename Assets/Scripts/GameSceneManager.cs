@@ -21,14 +21,26 @@ public class GameSceneManager : MonoBehaviour
     void Start()
     {
         string cancionElegida = SongMenuManager.CancionSeleccionada;
-        if (string.IsNullOrEmpty(cancionElegida)) return;
+
+        // Fallback para poder probar directamente en GameScene sin usar el menú
+        if (string.IsNullOrEmpty(cancionElegida))
+        {
+            cancionElegida = "NOMBRE_DE_TU_ZIP_DE_PRUEBA_AQUI"; // Reemplaza con un nombre de archivo real
+            Debug.LogWarning($"[GameSceneManager] Prueba directa. Usando: {cancionElegida}");
+        }
+        //AudioManager.instance.Stop();
         StartCoroutine(ProcesarZipYJugar(cancionElegida));
     }
 
     IEnumerator ProcesarZipYJugar(string nombreZip)
     {
         string rutaArchivoZip = Path.Combine(Application.dataPath, $"Resources/MusicFiles/ZipFiles/{nombreZip}.zip");
-        if (!File.Exists(rutaArchivoZip)) yield break;
+
+        if (!File.Exists(rutaArchivoZip))
+        {
+            Debug.LogError($"[GameSceneManager] No se encontró el ZIP en: {rutaArchivoZip}");
+            yield break;
+        }
 
         string contenidoOsu = "";
         byte[] audioBytes = null;
@@ -87,13 +99,15 @@ public class GameSceneManager : MonoBehaviour
         if (string.IsNullOrEmpty(contenidoOsu) && !string.IsNullOrEmpty(mapaRespaldoTexto))
             contenidoOsu = mapaRespaldoTexto;
 
-        // 1. CARGAR EL AUDIO PRIMERO
         if (audioBytes != null && tipoDeAudio != AudioType.UNKNOWN)
         {
             string rutaTemporal = Path.Combine(Application.temporaryCachePath, nombreArchivoAudio);
             File.WriteAllBytes(rutaTemporal, audioBytes);
 
-            using (UnityWebRequest multimediaRequest = UnityWebRequestMultimedia.GetAudioClip("file://" + rutaTemporal, tipoDeAudio))
+            // CORRECCIÓN: Formato de URI obligatorio para UnityWebRequest local
+            string rutaUri = "file:///" + rutaTemporal.Replace("\\", "/");
+
+            using (UnityWebRequest multimediaRequest = UnityWebRequestMultimedia.GetAudioClip(rutaUri, tipoDeAudio))
             {
                 yield return multimediaRequest.SendWebRequest();
 
@@ -103,17 +117,19 @@ public class GameSceneManager : MonoBehaviour
                     AudioManager.instance.musicTheme.clip = clipDeMusica;
                     if (File.Exists(rutaTemporal)) File.Delete(rutaTemporal);
                 }
+                else
+                {
+                    Debug.LogError("[GameSceneManager] Falló carga de audio: " + multimediaRequest.error);
+                }
             }
         }
 
-        // 2. INICIALIZAR SPAWNER SÓLO CUANDO EL AUDIO YA ESTÁ CARGADO
         if (!string.IsNullOrEmpty(contenidoOsu))
         {
             CubeSpawnManager spawner = cubeSpawnManager.GetComponent<CubeSpawnManager>();
             if (spawner != null) spawner.InicializarMapaDesdeTexto(contenidoOsu);
         }
 
-        // 3. INICIAR UI
         if (AudioManager.instance.musicTheme.clip != null)
         {
             audioClipLength = AudioManager.instance.musicTheme.clip.length;

@@ -12,7 +12,7 @@ public class CubeSpawnManager : MonoBehaviour
 
     [Header("Configuración de Movimiento")]
     [Tooltip("Offset desde el Spawnpoint hasta el punto de golpeo (ej. (0,0,-10) si los cubos avanzan hacia atrás)")]
-    public Vector3 hitPointOffset = new Vector3(0, -0.1f, -2f);  // Ajusta según tu escena
+    public Vector3 hitPointOffset = new Vector3(0, 0, -22.21f);  // Ajusta según tu escena
 
     [Tooltip("Silencio antes de que inicie la canción. Debe ser mayor que approachTime para que los primeros cubos se vean venir.")]
     public float leadInDelay = 3.5f;      // Tiempo de preparación antes de que empiece la música
