@@ -2442,7 +2442,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 221, y: 146}
+  m_CellSize: {x: 500, y: 130}
   m_Spacing: {x: 32, y: 14}
   m_Constraint: 0
   m_ConstraintCount: 6
@@ -4511,8 +4511,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3d883482e1692a4ba7b7a63ba6c71b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  contenedorBotones: {fileID: 1680743437}
-  "prefabBot\xF3n": {fileID: 312367013}
+  contenedorBotones: {fileID: 477750895}
+  prefabBoton: {fileID: 1170000000000000100, guid: 386b4e568f324aa7a4cd3d80bfe56860, type: 3}
   nombreEscenaJuego: GameScene
 --- !u!4 &819793243
 Transform:
@@ -8789,7 +8789,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 520
   m_MinHeight: -1
   m_PreferredWidth: -1
   m_PreferredHeight: -1
@@ -9864,7 +9864,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1769753443
 RectTransform:
   m_ObjectHideFlags: 0
