@@ -16,6 +16,12 @@ public class GameSceneManager : MonoBehaviour
     [Header("Managers")]
     public GameObject cubeSpawnManager;
 
+    [Header("Pantallas de Puntaje")]
+    [Tooltip("HUD de puntaje en vivo durante la partida (UI_ScoreCurrent). Se oculta al terminar.")]
+    public GameObject hudEnVivo;
+    [Tooltip("Pantalla de resultados (UI_ScoreFinal). Arranca oculta y se muestra al terminar.")]
+    public GameObject panelResultados;
+
     private float audioClipLength;
 
     void Start()
@@ -160,13 +166,16 @@ public class GameSceneManager : MonoBehaviour
         cubeSpawnManager.SetActive(false);
         timerUI_Gameobject.SetActive(false);
 
-        // Cierra el ciclo de puntaje: persiste el récord y pinta la pantalla de
-        // resultados. NOTA: finalScoreText/highScoreText deben asignarse en el
-        // Inspector del ScoreManager para que los resultados se muestren.
+        // Cierra el ciclo de puntaje: persiste el récord y pinta finalScoreText /
+        // highScoreText (ya cableados en el ScoreManager de la escena).
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.FinalizarPartida();
         }
+
+        // Cambia del HUD de juego a la pantalla de resultados.
+        if (hudEnVivo != null) hudEnVivo.SetActive(false);
+        if (panelResultados != null) panelResultados.SetActive(true);
     }
 
     private string ConvertToMinAndSeconds(float totalTimeInSeconds)
