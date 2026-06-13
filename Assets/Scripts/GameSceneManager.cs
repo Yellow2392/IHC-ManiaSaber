@@ -159,6 +159,14 @@ public class GameSceneManager : MonoBehaviour
     {
         cubeSpawnManager.SetActive(false);
         timerUI_Gameobject.SetActive(false);
+
+        // Cierra el ciclo de puntaje: persiste el récord y pinta la pantalla de
+        // resultados. NOTA: finalScoreText/highScoreText deben asignarse en el
+        // Inspector del ScoreManager para que los resultados se muestren.
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.FinalizarPartida();
+        }
     }
 
     private string ConvertToMinAndSeconds(float totalTimeInSeconds)

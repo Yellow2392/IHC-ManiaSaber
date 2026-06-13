@@ -11,8 +11,10 @@ public class CubeHit : MonoBehaviour
 
     public void ProcesarGolpe(int tipoSableQueGolpeo)
     {
-        // 1. Validación de color/mano
-        if (tipoSableQueGolpeo == tipoCuboAsignado)
+        // 1. Validación de color/mano. Solo puntúa el sable correcto; el cubo se
+        //    destruye en cualquier caso (al final del método).
+        if (tipoSableQueGolpeo == tipoCuboAsignado
+            && AudioManager.instance != null && AudioManager.instance.musicTheme != null)
         {
             float tiempoActual = AudioManager.instance.musicTheme.time;
             float diferencia = Mathf.Abs(tiempoGolpeExacto - tiempoActual);
@@ -21,33 +23,26 @@ public class CubeHit : MonoBehaviour
             if (diferencia <= margenErrorMaximo)
             {
                 CalcularPuntaje(diferencia);
-                
+
                 // 3. Feedback de Audio: Reproduce el sonido de corte
-                if (AudioManager.instance != null && AudioManager.instance.sliceSound != null)
+                AudioSource slice = AudioManager.instance.sliceSound;
+                if (slice != null && slice.clip != null)
                 {
-                    // PlayOneShot evita que el sonido se corte si destruimos el objeto inmediatamente
-                    AudioManager.instance.sliceSound.PlayOneShot(AudioManager.instance.sliceSound.clip);
+                    // PlayOneShot evita que el sonido se corte al destruir el objeto inmediatamente
+                    slice.PlayOneShot(slice.clip);
                 }
 
                 // TODO: Aquí irá el sistema de partículas en el siguiente paso
-                
-                Destroy(gameObject); 
-            }
-            else
-            {
-                Destroy(gameObject);
             }
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        Destroy(gameObject);
     }
 
     private void CalcularPuntaje(float diferencia)
     {
         float precision = 1.0f - (diferencia / margenErrorMaximo);
-        int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo)); 
+        int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo));
 
         // 4. Feedback de Datos: Suma los puntos al ScoreManager global
         if (ScoreManager.Instance != null)
