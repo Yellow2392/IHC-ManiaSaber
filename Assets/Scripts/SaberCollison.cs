@@ -2,13 +2,21 @@ using UnityEngine;
 
 public class SaberCollision : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    [Header("Configuraci√≥n de Identidad")]
+    [Tooltip("0 = Sable Izquierdo (Mano A), 1 = Sable Derecho (Mano B)")]
+    public int tipoSable; 
+
+    private void OnTriggerEnter(Collider other)   
     {
-        // Revisa si el objeto con el que choca tiene el tag de tu cubo o un script especÌfico
-        if (other.gameObject.CompareTag("Cube"))
+        // Esto imprimir√° un mensaje CUALQUIER cosa que toque el sable
+        Debug.Log($"[Sable] Toqu√© algo llamado: {other.gameObject.name}"); 
+        // Buscamos de forma general si el objeto golpeado tiene la identidad de un CuboHit
+        CubeHit cubo = other.GetComponent<CubeHit>();
+
+        if (cubo != null)
         {
-            // AquÌ ir· la lÛgica para instanciar las mitades cortadas
-            Destroy(other.gameObject);
+            // Le notificamos al cubo que fue golpeado y le pasamos qu√© sable lo toc√≥
+            cubo.ProcesarGolpe(tipoSable);
         }
     }
 }
