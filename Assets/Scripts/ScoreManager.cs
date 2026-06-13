@@ -13,11 +13,19 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI highScoreText;
 
     private int puntajeActual = 0;
-    private string KEY_HIGH_SCORE = "Highscore_ManiaSaber";
+    private const string KEY_HIGH_SCORE = "Highscore_ManiaSaber";
 
     void Awake()
     {
-        if (Instance == null) Instance = this;
+        // Mismo patrón singleton que AudioManager: evita un manager fantasma si
+        // hubiera dos ScoreManager en la escena.
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
     }
 
     void Start()

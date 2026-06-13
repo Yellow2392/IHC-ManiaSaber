@@ -1040,8 +1040,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentScoreText: {fileID: 448433545}
-  finalScoreText: {fileID: 0}
-  highScoreText: {fileID: 0}
+  finalScoreText: {fileID: 1409727138}
+  highScoreText: {fileID: 1721821175}
 --- !u!1 &546668396
 GameObject:
   m_ObjectHideFlags: 0
@@ -1060,7 +1060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &546668397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2006,6 +2006,8 @@ MonoBehaviour:
   progressBarImage: {fileID: 1259635496}
   timerUI_Gameobject: {fileID: 1240951553}
   cubeSpawnManager: {fileID: 1005023590}
+  hudEnVivo: {fileID: 75154934}
+  panelResultados: {fileID: 546668396}
 --- !u!1 &1303733962
 GameObject:
   m_ObjectHideFlags: 0
