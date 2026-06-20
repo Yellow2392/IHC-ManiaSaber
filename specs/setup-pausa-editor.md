@@ -1,8 +1,16 @@
-# Pendiente manual en el Editor — Pausa (RF-12 / RF-13)
+# Setup en el Editor — Pausa (RF-12 / RF-13)
+
+> **Estado: ✅ COMPLETADO** en `Assets/Scenes/GameScene.unity` (20 jun 2026).
+> El canvas `UI_Pause`, el GameObject `PauseManager` (bajo `[MANAGERS]`) y todas
+> las referencias quedaron cableados y verificados en Play mode
+> (pausar → `timeScale=0` + panel visible; continuar → restaura; `BloquearPausa`
+> → restaura al terminar). Los textos reales creados son: `Text_Title` ("PAUSA"),
+> `Text_Hint_Continuar` ("A — Continuar"), `Text_Hint_Reiniciar` ("B — Reiniciar")
+> y `Text_Hint_Menu` ("X — Menú"). Las secciones siguientes quedan como referencia
+> de cómo se construyó.
 
 La lógica de pausa está en `Assets/Scripts/PauseManager.cs` y ya integrada en
-`GameSceneManager`. Para que funcione en juego **falta cablear la escena en el
-Editor de Unity** (no es editable por código). Todo esto se hace en
+`GameSceneManager`. El cableado de escena (no editable por código) se hizo en
 `Assets/Scenes/GameScene.unity`.
 
 ## 1. Crear el canvas `UI_Pause`
