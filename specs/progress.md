@@ -1,6 +1,6 @@
 # Estado de avance — Matriz RF / RNF
 
-Estado del proyecto al **13 de junio de 2026**. Leyenda: ✅ implementado · 🟡 parcial · ⬜ pendiente.
+Estado del proyecto al **20 de junio de 2026**. Leyenda: ✅ implementado · 🟡 parcial · ⬜ pendiente.
 
 ## Requisitos funcionales
 
@@ -15,15 +15,16 @@ Estado del proyecto al **13 de junio de 2026**. Leyenda: ✅ implementado · �
 | RF-07 | Diferenciación de cubos por color/sable | Must | ✅ | Prefabs A/B + asignación `tipoCubo` (alterna en acordes) |
 | RF-08 | Detección de impacto | Must | ✅ | `CubeHit.cs` (`OnTriggerEnter` + match `Saber.tipoSable`) |
 | RF-09 | Feedback visual/sonoro/háptico al acertar | Should | 🟡 | Corte visual (`Slicer`/`CubeExplode`) presente; **háptica no implementada** (sin `OVRInput.SetControllerVibration`) |
-| RF-10 | Registro de fallos | Must | ⬜ | `CubeMovement.cs` destruye el cubo al pasar **sin** contabilizar fallo |
+| RF-10 | Registro de fallos | Must | ✅ | `CubeHit`/`CubeMovement` registran acierto/fallo en `ScoreManager` (flag `resuelto` evita doble conteo) |
 | RF-11 | Puntuación en tiempo real | Should | ✅ | `CubeHit.cs` (puntaje por precisión, mín. 10) + `ScoreManager.cs` (UI) |
 | RF-12 | Pausa de partida | Should | ⬜ | No implementado |
 | RF-13 | Opciones en pausa (continuar/reiniciar/menú) | Should | ⬜ | No implementado |
-| RF-14 | Pantalla de resultados (puntaje, precisión, aciertos/fallos) | Must | ⬜ | `GameSceneManager.GameOver()` solo desactiva UI; falta panel de resultados |
-| RF-15 | Acciones post-partida (reiniciar / volver) | Should | ⬜ | No implementado |
+| RF-14 | Pantalla de resultados (puntaje, precisión, aciertos/fallos) | Must | 🟡 | `ScoreManager.FinalizarPartida()` calcula y pinta puntaje, récord, precisión y aciertos/fallos; **falta crear/cablear** `precisionText`/`aciertosFallosText` en `UI_ScoreFinal` (Editor) |
+| RF-15 | Acciones post-partida (reiniciar / volver) | Should | 🟡 | `ResultadosController.cs` (`Reintentar`/`VolverASeleccion`); **falta crear/cablear** los botones en `UI_ScoreFinal` (Editor) |
 
-**Resumen:** 8 ✅ · 2 🟡 · 5 ⬜ (de 15). Los *Must Have* del núcleo de juego (RF-01, 03, 05, 06, 07, 08)
-están cubiertos; quedan pendientes RF-10 y RF-14 (*Must*) y el ciclo de fin de partida.
+**Resumen:** 9 ✅ · 4 🟡 · 2 ⬜ (de 15). Los *Must Have* del núcleo de juego (RF-01, 03, 05, 06, 07,
+08, 10) están cubiertos. RF-14 y RF-15 quedan 🟡: la lógica de código está completa y solo resta el
+cableado de UI/botones en el Editor (ver spec 005). Pendientes reales: RF-12/RF-13 (pausa).
 
 ## Requisitos no funcionales
 
@@ -52,21 +53,22 @@ Cronograma planificado: semanas 10–15. Reconstrucción del avance real a parti
 
 ## Deuda técnica y riesgos
 
-- **Fallos no contabilizados (RF-10):** `CubeMovement` destruye los cubos no golpeados sin notificar
-  a `ScoreManager`; sin esto no hay precisión real (RF-14) ni métrica *Task Success* (HEART).
+- ~~**Fallos no contabilizados (RF-10):**~~ Resuelto: `CubeHit` y `CubeMovement` notifican
+  acierto/fallo a `ScoreManager` (flag `resuelto` evita doble conteo). Ya hay precisión real (RF-14).
 - **Doble ruta de colisión:** coexisten `CubeHit` (golpeo con timing + puntaje) y `SaberCollison`
   (destrucción simple por tag `Cube`). Conviene unificar para evitar comportamiento ambiguo.
 - **Calibración manual de timing:** `approachTime = 2.221`, `leadInDelay = 3.5` y `hitPointOffset`
   están afinados a mano (`CubeSpawnManager`); un cambio de escala de escena los rompe.
 - **Háptica ausente (RF-09/RNF-04):** falta `OVRInput.SetControllerVibration` en `CubeHit`.
-- **Persistencia de servicios:** `ScoreManager` no usa `DontDestroyOnLoad`; al añadir resultados en
-  otra escena habrá que decidir cómo transportar el puntaje final.
+- **Persistencia de servicios:** `ScoreManager` no usa `DontDestroyOnLoad`. No es problema hoy porque
+  los resultados viven en la misma `GameScene`; reintentar la recarga y los contadores vuelven a 0
+  (correcto). Solo habría que revisarlo si los resultados se movieran a otra escena.
 
 ## Próximos pasos sugeridos (orden recomendado)
 
-1. **RF-10** — contabilizar fallos en `CubeMovement` → habilita precisión.
+1. **RF-14 / RF-15 (cierre)** — en el Editor: crear y cablear `precisionText`/`aciertosFallosText` y
+   los botones Reintentar/Volver en `UI_ScoreFinal` (la lógica de código ya está lista).
 2. **RF-09 / RNF-04** — háptica en el golpe acertado.
-3. **RF-14 / RF-15** — pantalla de resultados (puntaje, precisión, aciertos/fallos) + acciones.
-4. **RF-12 / RF-13** — pausa con continuar/reiniciar/menú.
-5. **RF-02** — pista ambiental de menú.
-6. **RNF-01..06** — profiling en dispositivo y pruebas de confort/usabilidad (métricas HEART, sem 15).
+3. **RF-12 / RF-13** — pausa con continuar/reiniciar/menú.
+4. **RF-02** — pista ambiental de menú.
+5. **RNF-01..06** — profiling en dispositivo y pruebas de confort/usabilidad (métricas HEART, sem 15).
