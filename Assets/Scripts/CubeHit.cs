@@ -7,10 +7,15 @@ public class CubeHit : MonoBehaviour
     [HideInInspector] public bool resuelto = false;   // Evita doble conteo (golpe vs expiración en el mismo frame)
 
     [Header("Configuración de Golpe")]
-    public float margenErrorMaximo = 0.2f; // Segundos de tolerancia para hit
+    public float margenErrorMaximo = 0.2f;
     public int puntajeMaximo = 100;
 
-    public void ProcesarGolpe(int tipoSableQueGolpeo)
+    [Header("Efectos Visuales (Nivel 1 y 2)")]
+    [Tooltip("Arrastra aquí el SwordsCube_Sliced_Prefab")]
+    public GameObject prefabCuboPartido;
+
+    // Ahora recibimos la dirección del tajo del sable
+    public void ProcesarGolpe(int tipoSableQueGolpeo, Vector3 direccionCorte)
     {
         // Si este cubo ya fue resuelto (acierto/fallo) no se cuenta de nuevo.
         if (resuelto) return;
@@ -26,7 +31,6 @@ public class CubeHit : MonoBehaviour
             float tiempoActual = AudioManager.instance.musicTheme.time;
             float diferencia = Mathf.Abs(tiempoGolpeExacto - tiempoActual);
 
-            // 2. Validación de ritmo
             if (diferencia <= margenErrorMaximo)
             {
                 CalcularPuntaje(diferencia);
@@ -40,7 +44,19 @@ public class CubeHit : MonoBehaviour
                     slice.PlayOneShot(slice.clip);
                 }
 
-                // TODO: Aquí irá el sistema de partículas en el siguiente paso
+                // VISUAL (Nivel 2: Alineación por ángulo): genera el cubo partido
+                // orientado hacia la dirección del corte del sable.
+                if (prefabCuboPartido != null)
+                {
+                    Quaternion rotacionCorte = Quaternion.identity;
+                    if (direccionCorte != Vector3.zero)
+                    {
+                        rotacionCorte = Quaternion.LookRotation(direccionCorte);
+                    }
+
+                    // Instanciamos el objeto partido con la rotación del corte exacta
+                    Instantiate(prefabCuboPartido, transform.position, rotacionCorte);
+                }
             }
         }
 
@@ -60,7 +76,6 @@ public class CubeHit : MonoBehaviour
         float precision = 1.0f - (diferencia / margenErrorMaximo);
         int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo));
 
-        // 4. Feedback de Datos: Suma los puntos al ScoreManager global
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.SumarPuntos(puntosObtenidos);

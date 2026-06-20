@@ -15,6 +15,8 @@ public class GameSceneManager : MonoBehaviour
 
     [Header("Managers")]
     public GameObject cubeSpawnManager;
+    [Tooltip("Gestor de pausa. Se bloquea al terminar la partida para no pausar sobre la pantalla de resultados.")]
+    public PauseManager pauseManager;
 
     [Header("Pantallas de Puntaje")]
     [Tooltip("HUD de puntaje en vivo durante la partida (UI_ScoreCurrent). Se oculta al terminar.")]
@@ -165,6 +167,10 @@ public class GameSceneManager : MonoBehaviour
     {
         cubeSpawnManager.SetActive(false);
         timerUI_Gameobject.SetActive(false);
+
+        // Bloquea la pausa: ya no debe poder pausarse sobre la pantalla de resultados.
+        if (pauseManager != null) pauseManager.BloquearPausa();
+        else if (PauseManager.Instance != null) PauseManager.Instance.BloquearPausa();
 
         // Cierra el ciclo de puntaje: persiste el récord y pinta finalScoreText /
         // highScoreText (ya cableados en el ScoreManager de la escena).
