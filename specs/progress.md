@@ -19,13 +19,13 @@ Estado del proyecto al **20 de junio de 2026**. Leyenda: ✅ implementado · �
 | RF-11 | Puntuación en tiempo real | Should | ✅ | `CubeHit.cs` (puntaje por precisión, mín. 10) + `ScoreManager.cs` (UI) |
 | RF-12 | Pausa de partida | Should | ✅ | `PauseManager.cs`: toggle con botón ☰ (`OVRInput.Button.Start`); congela `Time.timeScale=0` **+** `musicTheme.Pause()`; canvas `UI_Pause` y refs cableados en `GameScene` ✅ |
 | RF-13 | Opciones en pausa (continuar/reiniciar/menú) | Should | ✅ | `PauseManager.cs`: A=continuar, B=reiniciar (recarga `GameScene`), X=menú (`MenuSongs`); métodos públicos listos para cablear a `Button.onClick` |
-| RF-14 | Pantalla de resultados (puntaje, precisión, aciertos/fallos) | Must | 🟡 | `ScoreManager.FinalizarPartida()` calcula y pinta puntaje, récord, precisión y aciertos/fallos; **falta crear/cablear** `precisionText`/`aciertosFallosText` en `UI_ScoreFinal` (Editor) |
-| RF-15 | Acciones post-partida (reiniciar / volver) | Should | 🟡 | `ResultadosController.cs` (`Reintentar`/`VolverASeleccion`); **falta crear/cablear** los botones en `UI_ScoreFinal` (Editor) |
+| RF-14 | Pantalla de resultados (puntaje, precisión, aciertos/fallos) | Must | ✅ | `ScoreManager.FinalizarPartida()` calcula puntaje, récord, precisión y aciertos/fallos; `precisionText`/`aciertosFallosText` creados y cableados en `UI_ScoreFinal` (verificado en Play mode: precisión 85.4%, aciertos/fallos) |
+| RF-15 | Acciones post-partida (reiniciar / volver) | Should | ✅ | `ResultadosController.cs` añadido al GO `ScoreManager`; botones **Reintentar** (`Reintentar`) y **Volver** (`VolverASeleccion`) creados y cableados (`onClick`) en `UI_ScoreFinal` |
 
-**Resumen:** 11 ✅ · 4 🟡 · 0 ⬜ (de 15). Los *Must Have* del núcleo de juego (RF-01, 03, 05, 06, 07,
-08, 10) están cubiertos, y la pausa (RF-12/RF-13) quedó implementada y cableada (`PauseManager` +
-`UI_Pause`). RF-14 y RF-15 quedan 🟡: la lógica de código está completa y solo resta el cableado de
-UI/botones en el Editor (ver spec 005). Pendientes reales: háptica (RF-09) y pista de menú (RF-02).
+**Resumen:** 13 ✅ · 2 🟡 · 0 ⬜ (de 15). Los *Must Have* del núcleo de juego (RF-01, 03, 05, 06, 07,
+08, 10) están cubiertos, la pausa (RF-12/RF-13) quedó implementada y cableada (`PauseManager` +
+`UI_Pause`), y la pantalla de resultados con sus acciones (RF-14/RF-15) ya está cableada y verificada
+en `UI_ScoreFinal`. Pendientes reales: háptica (RF-09) y pista de menú (RF-02).
 
 ## Requisitos no funcionales
 
@@ -74,8 +74,8 @@ Cronograma planificado: semanas 10–15. Reconstrucción del avance real a parti
 
 ## Próximos pasos sugeridos (orden recomendado)
 
-1. **RF-14 / RF-15 (cierre)** — en el Editor: crear y cablear `precisionText`/`aciertosFallosText` y
-   los botones Reintentar/Volver en `UI_ScoreFinal` (la lógica de código ya está lista).
+1. ~~**RF-14 / RF-15 (cierre)** — crear y cablear `precisionText`/`aciertosFallosText` y los botones
+   Reintentar/Volver en `UI_ScoreFinal`.~~ ✅ Cableado y verificado en Play mode.
 2. **RF-09 / RNF-04** — háptica en el golpe acertado.
 3. ~~**RF-12 / RF-13** — pausa con continuar/reiniciar/menú.~~ ✅ Implementado y cableado en `GameScene` (`PauseManager.cs` + canvas `UI_Pause`).
 4. **RF-02** — pista ambiental de menú.
