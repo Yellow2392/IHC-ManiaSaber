@@ -1,3 +1,6 @@
+# ==========================
+# Carpetas generadas por Unity
+# ==========================
 .vs/
 Library/
 Temp/
@@ -5,8 +8,35 @@ Obj/
 Build/
 Builds/
 Logs/
-<<<<<<< HEAD
 UserSettings/
-=======
-UserSettings/
->>>>>>> ddfa312b5a97a809a5ba70dfeac94a0ec00bf383
+MemoryCaptures/
+
+# ==========================
+# Archivos de proyecto/solución autogenerados (VS / Rider / IDE)
+# Unity los regenera al abrir el proyecto
+# ==========================
+.vsconfig
+*.csproj
+*.sln
+*.unityproj
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.tmp
+
+# ==========================
+# Artefactos de build
+# ==========================
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# ==========================
+# Varios
+# ==========================
+# Los .meta solo se ignoran si su asset correspondiente también se ignora
+!/[Aa]ssets/**/*.meta

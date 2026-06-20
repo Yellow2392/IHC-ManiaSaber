@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class CubeHit : MonoBehaviour
 {
-    [HideInInspector] public float tiempoGolpeExacto; 
-    [HideInInspector] public int tipoCuboAsignado;    
+    [HideInInspector] public float tiempoGolpeExacto;
+    [HideInInspector] public int tipoCuboAsignado;
 
     [Header("Configuración de Golpe")]
-    public float margenErrorMaximo = 0.2f; 
+    public float margenErrorMaximo = 0.2f;
     public int puntajeMaximo = 100;
 
     [Header("Efectos Visuales (Nivel 1 y 2)")]
@@ -16,7 +16,10 @@ public class CubeHit : MonoBehaviour
     // Ahora recibimos la dirección del tajo del sable
     public void ProcesarGolpe(int tipoSableQueGolpeo, Vector3 direccionCorte)
     {
-        if (tipoSableQueGolpeo == tipoCuboAsignado)
+        // 1. Validación de color/mano. Solo puntúa el sable correcto; el cubo se
+        //    destruye en cualquier caso (al final del método).
+        if (tipoSableQueGolpeo == tipoCuboAsignado
+            && AudioManager.instance != null && AudioManager.instance.musicTheme != null)
         {
             float tiempoActual = AudioManager.instance.musicTheme.time;
             float diferencia = Mathf.Abs(tiempoGolpeExacto - tiempoActual);
@@ -24,17 +27,19 @@ public class CubeHit : MonoBehaviour
             if (diferencia <= margenErrorMaximo)
             {
                 CalcularPuntaje(diferencia);
-                
-                // AUDIO
-                if (AudioManager.instance != null && AudioManager.instance.sliceSound != null)
+
+                // 3. Feedback de Audio: Reproduce el sonido de corte
+                AudioSource slice = AudioManager.instance.sliceSound;
+                if (slice != null && slice.clip != null)
                 {
-                    AudioManager.instance.sliceSound.PlayOneShot(AudioManager.instance.sliceSound.clip);
+                    // PlayOneShot evita que el sonido se corte al destruir el objeto inmediatamente
+                    slice.PlayOneShot(slice.clip);
                 }
 
-                // VISUAL (Nivel 2: Alineación por ángulo)
+                // VISUAL (Nivel 2: Alineación por ángulo): genera el cubo partido
+                // orientado hacia la dirección del corte del sable.
                 if (prefabCuboPartido != null)
                 {
-                    // Calculamos una rotación orientada hacia la dirección del corte del sable
                     Quaternion rotacionCorte = Quaternion.identity;
                     if (direccionCorte != Vector3.zero)
                     {
@@ -44,24 +49,16 @@ public class CubeHit : MonoBehaviour
                     // Instanciamos el objeto partido con la rotación del corte exacta
                     Instantiate(prefabCuboPartido, transform.position, rotacionCorte);
                 }
-                
-                Destroy(gameObject); 
-            }
-            else
-            {
-                Destroy(gameObject);
             }
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        Destroy(gameObject);
     }
 
     private void CalcularPuntaje(float diferencia)
     {
         float precision = 1.0f - (diferencia / margenErrorMaximo);
-        int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo)); 
+        int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo));
 
         if (ScoreManager.Instance != null)
         {

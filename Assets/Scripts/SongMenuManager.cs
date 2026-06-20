@@ -6,11 +6,11 @@ using TMPro;
 
 public class SongMenuManager : MonoBehaviour
 {
-    [Header("Configuración de UI")]
+    [Header("ConfiguraciÃ³n de UI")]
     public Transform contenedorBotones;
-    public GameObject prefabBotón;
+    public GameObject prefabBoton;
 
-    [Header("Configuración de Escena")]
+    [Header("ConfiguraciÃ³n de Escena")]
     public string nombreEscenaJuego = "GameScene";
 
     public static string CancionSeleccionada { get; private set; }
@@ -28,51 +28,68 @@ public class SongMenuManager : MonoBehaviour
             Destroy(hijo.gameObject);
         }
 
-        // 2. Definimos la ruta real en el disco duro dentro de tu proyecto
+        // 2. Ruta real en disco dentro del proyecto
         string rutaCarpeta = Path.Combine(Application.dataPath, "Resources/MusicFiles/ZipFiles");
 
         if (!Directory.Exists(rutaCarpeta))
         {
-            Debug.LogError($"La carpeta no existe en la ruta: {rutaCarpeta}. Asegúrate de crear las carpetas dentro de Assets.");
+            Debug.LogError($"La carpeta no existe en la ruta: {rutaCarpeta}. AsegÃºrate de crear las carpetas dentro de Assets.");
             return;
         }
 
-        // 3. Buscamos TODOS los archivos que terminen estrictamente en .zip
+        // 3. Buscar todos los archivos que terminen estrictamente en .zip
         string[] archivosZip = Directory.GetFiles(rutaCarpeta, "*.zip");
 
         if (archivosZip.Length == 0)
         {
-            Debug.LogWarning("No se encontró ningún archivo .zip en la carpeta MusicFiles/ZipFiles");
+            Debug.LogWarning("No se encontrÃ³ ningÃºn archivo .zip en la carpeta MusicFiles/ZipFiles");
             return;
         }
 
         foreach (string rutaCompleta in archivosZip)
         {
-            // Extrae solo el nombre (ej: de "C:/.../Thriller.zip" a "Thriller")
-            string nombreCancion = Path.GetFileNameWithoutExtension(rutaCompleta);
+            // 4. Leer la metadata del .osu dentro del zip (tÃ­tulo, artista, BPM, portada...).
+            //    nombreZip (nombre del archivo sin extensiÃ³n) sigue siendo la clave de selecciÃ³n.
+            SongMetadata datos = OsuZipReader.LeerMetadata(rutaCompleta);
 
-            // 4. Crear el botón
-            GameObject nuevoBoton = Instantiate(prefabBotón, contenedorBotones);
+            // 5. Crear la tarjeta/botÃ³n
+            GameObject nuevoBoton = Instantiate(prefabBoton, contenedorBotones);
 
-            TMP_Text textoBoton = nuevoBoton.GetComponentInChildren<TMP_Text>();
-            if (textoBoton != null)
+            SongCardController card = nuevoBoton.GetComponent<SongCardController>();
+            if (card != null)
             {
-                textoBoton.text = nombreCancion;
+                card.Configurar(datos);
             }
             else
             {
-                nuevoBoton.GetComponentInChildren<Text>().text = nombreCancion;
+                // Respaldo heredado: prefab simple con un solo texto.
+                TMP_Text textoBoton = nuevoBoton.GetComponentInChildren<TMP_Text>();
+                if (textoBoton != null)
+                {
+                    textoBoton.text = datos.titulo;
+                }
+                else
+                {
+                    Text textoLegacy = nuevoBoton.GetComponentInChildren<Text>();
+                    if (textoLegacy != null)
+                    {
+                        textoLegacy.text = datos.titulo;
+                    }
+                }
             }
 
             Button componenteBoton = nuevoBoton.GetComponent<Button>();
-            componenteBoton.onClick.AddListener(() => SeleccionarCancion(nombreCancion));
+            if (componenteBoton != null)
+            {
+                componenteBoton.onClick.AddListener(() => SeleccionarCancion(datos.nombreZip));
+            }
         }
     }
 
-    void SeleccionarCancion(string nombre)
+    public void SeleccionarCancion(string nombre)
     {
         CancionSeleccionada = nombre;
-        Debug.Log("Canción ZIP seleccionada: " + CancionSeleccionada);
+        Debug.Log("CanciÃ³n ZIP seleccionada: " + CancionSeleccionada);
         SceneManager.LoadScene(nombreEscenaJuego);
     }
 }
