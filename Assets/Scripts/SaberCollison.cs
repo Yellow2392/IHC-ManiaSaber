@@ -6,17 +6,36 @@ public class SaberCollision : MonoBehaviour
     [Tooltip("0 = Sable Izquierdo (Mano A), 1 = Sable Derecho (Mano B)")]
     public int tipoSable; 
 
+    private Vector3 posicionFrameAnterior;
+    private Vector3 direccionCorteActual;
+
+    void Start()
+    {
+        posicionFrameAnterior = transform.position;
+    }
+
+    void Update()
+    {
+        // Calculamos la dirección del movimiento en este frame
+        Vector3 movimientoEsteFrame = transform.position - posicionFrameAnterior;
+        
+        // Si la mano se movió, actualizamos el vector de dirección del corte
+        if (movimientoEsteFrame.sqrMagnitude > 0.0001f)
+        {
+            direccionCorteActual = movimientoEsteFrame.normalized;
+        }
+
+        posicionFrameAnterior = transform.position;
+    }
+
     private void OnTriggerEnter(Collider other)   
     {
-        // Esto imprimirá un mensaje CUALQUIER cosa que toque el sable
-        Debug.Log($"[Sable] Toqué algo llamado: {other.gameObject.name}"); 
-        // Buscamos de forma general si el objeto golpeado tiene la identidad de un CuboHit
         CubeHit cubo = other.GetComponent<CubeHit>();
 
         if (cubo != null)
         {
-            // Le notificamos al cubo que fue golpeado y le pasamos qué sable lo tocó
-            cubo.ProcesarGolpe(tipoSable);
+            // Le pasamos el ID del sable Y la dirección en la que viajaba la mano
+            cubo.ProcesarGolpe(tipoSable, direccionCorteActual);
         }
     }
 }

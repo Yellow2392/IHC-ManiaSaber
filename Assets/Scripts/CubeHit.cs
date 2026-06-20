@@ -2,34 +2,48 @@ using UnityEngine;
 
 public class CubeHit : MonoBehaviour
 {
-    [HideInInspector] public float tiempoGolpeExacto; // Asignado por CubeSpawnManager
-    [HideInInspector] public int tipoCuboAsignado;    // 0 para A, 1 para B
+    [HideInInspector] public float tiempoGolpeExacto; 
+    [HideInInspector] public int tipoCuboAsignado;    
 
     [Header("Configuración de Golpe")]
-    public float margenErrorMaximo = 0.2f; // Segundos de tolerancia para hit
+    public float margenErrorMaximo = 0.2f; 
     public int puntajeMaximo = 100;
 
-    public void ProcesarGolpe(int tipoSableQueGolpeo)
+    [Header("Efectos Visuales (Nivel 1 y 2)")]
+    [Tooltip("Arrastra aquí el SwordsCube_Sliced_Prefab")]
+    public GameObject prefabCuboPartido;
+
+    // Ahora recibimos la dirección del tajo del sable
+    public void ProcesarGolpe(int tipoSableQueGolpeo, Vector3 direccionCorte)
     {
-        // 1. Validación de color/mano
         if (tipoSableQueGolpeo == tipoCuboAsignado)
         {
             float tiempoActual = AudioManager.instance.musicTheme.time;
             float diferencia = Mathf.Abs(tiempoGolpeExacto - tiempoActual);
 
-            // 2. Validación de ritmo
             if (diferencia <= margenErrorMaximo)
             {
                 CalcularPuntaje(diferencia);
                 
-                // 3. Feedback de Audio: Reproduce el sonido de corte
+                // AUDIO
                 if (AudioManager.instance != null && AudioManager.instance.sliceSound != null)
                 {
-                    // PlayOneShot evita que el sonido se corte si destruimos el objeto inmediatamente
                     AudioManager.instance.sliceSound.PlayOneShot(AudioManager.instance.sliceSound.clip);
                 }
 
-                // TODO: Aquí irá el sistema de partículas en el siguiente paso
+                // VISUAL (Nivel 2: Alineación por ángulo)
+                if (prefabCuboPartido != null)
+                {
+                    // Calculamos una rotación orientada hacia la dirección del corte del sable
+                    Quaternion rotacionCorte = Quaternion.identity;
+                    if (direccionCorte != Vector3.zero)
+                    {
+                        rotacionCorte = Quaternion.LookRotation(direccionCorte);
+                    }
+
+                    // Instanciamos el objeto partido con la rotación del corte exacta
+                    Instantiate(prefabCuboPartido, transform.position, rotacionCorte);
+                }
                 
                 Destroy(gameObject); 
             }
@@ -49,7 +63,6 @@ public class CubeHit : MonoBehaviour
         float precision = 1.0f - (diferencia / margenErrorMaximo);
         int puntosObtenidos = Mathf.Max(10, Mathf.RoundToInt(precision * puntajeMaximo)); 
 
-        // 4. Feedback de Datos: Suma los puntos al ScoreManager global
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.SumarPuntos(puntosObtenidos);

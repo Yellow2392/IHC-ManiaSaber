@@ -96,6 +96,7 @@
     <Compile Include="Assets\Scripts\SongMenuManager.cs" />
     <Compile Include="Assets\Suggo Creations\RETROWAVE SKIES Lite\Scripts\GetGlobalMatrixLite.cs" />
     <Compile Include="Assets\Scripts\IRONHEAD\Slicer.cs" />
+    <Compile Include="Assets\SlicedPart.cs" />
     <Compile Include="Assets\VolumetricLines\Scripts\VolumetricLineBehavior.cs" />
     <Compile Include="Assets\ezy-slice-master\EzySlice\Framework\Triangulator.cs" />
     <Compile Include="Assets\ezy-slice-master\EzySlice\Framework\Line.cs" />
