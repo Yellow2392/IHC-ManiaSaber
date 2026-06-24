@@ -2,6 +2,7 @@
 # Carpetas generadas por Unity
 # ==========================
 .vs/
+.vscode/
 Library/
 Temp/
 Obj/
