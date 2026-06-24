@@ -8,32 +8,35 @@ public class MenuManager : MonoBehaviour
     public GameObject panelOpciones;
 
     [Header("Configuración de Escena")]
-    // Escribe aquí el nombre EXACTO de tu escena principal
     public string nombreEscenaJuego = "GameScene";
     public string nombreEscenaCanciones = "MenuSongs";
 
-    void Start()
-    {
-        Debug.Log("Inicio...");
-    }
+    [Header("Audio")]
+    public AudioClip sonidoBoton; // Arrastra tu sonido de clic aquí en el Inspector
 
-    // Se llama al presionar "Jugar"
     public void MostrarOpciones()
     {
-        Debug.Log("Inicio...");
+        ReproducirClic();
         SceneManager.LoadScene("MenuSongs");
     }
 
-    // Se llama al presionar cualquiera de las 3 opciones
     public void CargarEscenaJuego()
     {
+        ReproducirClic();
         SceneManager.LoadScene(nombreEscenaJuego);
     }
 
-    // Se llama al presionar "Salir"
     public void SalirJuego()
     {
-        Debug.Log("Saliendo de la aplicación...");
+        ReproducirClic();
         Application.Quit();
+    }
+
+    private void ReproducirClic()
+    {
+        if (AudioGlobal.instance != null && sonidoBoton != null)
+        {
+            AudioGlobal.instance.PlaySFX(sonidoBoton);
+        }
     }
 }
