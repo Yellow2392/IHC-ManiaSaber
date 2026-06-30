@@ -1,8 +1,9 @@
 # 005 — Ciclo de partida y resultados · spec
 
 **Estado:** 🟡 Parcial
-**Requisitos:** RF-12 (Pausa ⬜), RF-13 (Opciones en pausa ⬜), RF-14 (Pantalla de resultados ⬜),
-RF-15 (Acciones post-partida ⬜). Base de ciclo (temporizador + progreso + fin) ✅.
+**Requisitos:** RF-12 (Pausa ⬜), RF-13 (Opciones en pausa ⬜), RF-14 (Pantalla de resultados 🟡),
+RF-15 (Acciones post-partida 🟡). Base de ciclo (temporizador + progreso + fin) ✅.
+RF-14/RF-15: lógica de código completa; resta cablear textos y botones en `UI_ScoreFinal` (Editor).
 
 ## Objetivo
 
@@ -46,25 +47,34 @@ resultados ricos: el bucle de re-jugar queda incompleto.
 - Desde la pausa, el usuario **debe** poder **continuar**, **reiniciar** la canción o **volver al
   menú principal**. *(No implementado.)*
 
-### RF-14 — Pantalla de resultados ⬜
+### RF-14 — Pantalla de resultados 🟡
 - Al finalizar, **debe** mostrarse un panel con **puntaje total**, **precisión** y **conteo de
-  aciertos/fallos**. Hoy `GameOver()` solo **oculta** la UI; no hay panel de resultados ni cálculo de
-  precisión (depende de RF-10, registro de fallos). *(Pendiente.)*
+  aciertos/fallos**. `GameOver()` muestra `panelResultados` y `ScoreManager.FinalizarPartida()`
+  calcula la precisión (`aciertos / (aciertos+fallos)`) y pinta puntaje, récord, precisión y
+  aciertos/fallos. RF-10 (registro de fallos) ya está implementado. **Resta en el Editor:** crear los
+  textos `precisionText` y `aciertosFallosText` en `UI_ScoreFinal` y asignarlos en el `ScoreManager`.
 
-### RF-15 — Acciones post-partida ⬜
+### RF-15 — Acciones post-partida 🟡
 - Desde los resultados, **debe** poder **reiniciar** la canción o **volver** a la selección.
-  *(No implementado.)*
+  `ResultadosController.cs` expone `Reintentar()` (recarga `GameScene`) y `VolverASeleccion()`
+  (carga `MenuSongs`). **Resta en el Editor:** crear los botones en `UI_ScoreFinal` y cablear su
+  `onClick` a esos métodos.
 
 ## Fuera de alcance
 
 - Tablas de clasificación / rango global persistente.
-- Guardado de mejores puntajes entre sesiones.
 - Repetición por secciones de la canción.
+
+> Nota: el **récord local** (mejor puntaje entre sesiones) **sí** se persiste vía `PlayerPrefs`
+> (`Highscore_ManiaSaber`) en `ScoreManager.FinalizarPartida()`. Antes figuraba como fuera de alcance;
+> se mantiene por ser un único valor local (no es una tabla de clasificación).
 
 ## Dependencias
 
 - `SongMenuManager.CancionSeleccionada` para saber qué canción cargar.
 - `AudioManager.musicTheme` (reloj y fin de canción) y `ScoreManager` (puntaje final).
-- **RF-10** (registro de fallos) es prerequisito de la **precisión** mostrada en RF-14.
-- Para reiniciar/volver: recarga de escena o navegación con `SceneManager`. Definir cómo transportar
-  el puntaje final si los resultados viven en otra escena (`ScoreManager` no es persistente hoy).
+- **RF-10** (registro de fallos) es prerequisito de la **precisión** mostrada en RF-14. **Ya
+  implementado:** `CubeHit`/`CubeMovement` notifican acierto/fallo a `ScoreManager`.
+- Para reiniciar/volver se usa `SceneManager` (`ResultadosController`). Como los resultados viven en
+  la **misma** `GameScene`, no hace falta transportar el puntaje entre escenas: reintentar recarga la
+  escena y `ScoreManager` reinicia sus contadores.

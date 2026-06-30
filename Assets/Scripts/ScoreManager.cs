@@ -11,8 +11,12 @@ public class ScoreManager : MonoBehaviour
     [Header("UI Pantalla Final (Resultados)")]
     public TextMeshProUGUI finalScoreText;
     public TextMeshProUGUI highScoreText;
+    public TextMeshProUGUI precisionText;        // % de aciertos sobre el total
+    public TextMeshProUGUI aciertosFallosText;   // "Aciertos: X   Fallos: Y"
 
     private int puntajeActual = 0;
+    private int aciertos = 0;   // golpes válidos (sable correcto + dentro de margen)
+    private int fallos = 0;     // cubos no golpeados o golpes que no puntuaron
     private const string KEY_HIGH_SCORE = "Highscore_ManiaSaber";
 
     void Awake()
@@ -38,6 +42,18 @@ public class ScoreManager : MonoBehaviour
     {
         puntajeActual += puntos;
         ActualizarTextoActual();
+    }
+
+    // RF-10: registro de aciertos/fallos. Cada cubo se resuelve exactamente una vez
+    // (lo llaman CubeHit al golpear y CubeMovement al expirar sin golpear).
+    public void RegistrarAcierto()
+    {
+        aciertos++;
+    }
+
+    public void RegistrarFallo()
+    {
+        fallos++;
     }
 
     private void ActualizarTextoActual()
@@ -71,6 +87,20 @@ public class ScoreManager : MonoBehaviour
         if (highScoreText != null)
         {
             highScoreText.text = recordActual.ToString();
+        }
+
+        // 4. RF-14: precisión y conteo de aciertos/fallos.
+        int total = aciertos + fallos;
+        float precision = total > 0 ? (100f * aciertos / total) : 0f;
+
+        if (precisionText != null)
+        {
+            precisionText.text = precision.ToString("0.0") + "%";
+        }
+
+        if (aciertosFallosText != null)
+        {
+            aciertosFallosText.text = "Aciertos: " + aciertos + "   Fallos: " + fallos;
         }
     }
 }
