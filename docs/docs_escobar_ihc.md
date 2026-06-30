@@ -46,3 +46,19 @@ AUn no
 Sin embargo querio aclara que preferiria una opcion que nom e tome gran tiempo conseguir
  ""
   
+
+  9. QUe son los layer oerrides:
+  Layer Overrides: La solución: Queremos que los fragmentos choquen con el suelo y el entorno, pero no entre ellos.
+  AL poner objetos en una layer, permite definir como estos se relacioan entre si. 
+  POr ejemplo ene l proyeto, creamos una layer Saber Debris, de nombre (puede ser cualuqera) desde Project Settings, layers,. Ahi pusimos a todoslos pedazs . 
+  ¿Para que? leugo fuimos a project settins y a Physiscs y luego deactivar la casilla donde Coinidence SaberDebris con SaberDebris. ELlo hace que los objetiso  de esta capa se ignoren entre si. Pero no ignorarán los objetos de otras capas (am nos que lo hespcificquemos en la seccion de physics.)
+
+  10. Semana 12
+
+  Levantar proyecto 
+  darle a play grabacion 
+  PRobarlo tu personalmente (5min)
+  Verificar si ya se cumple lo de la semana
+  - grabar 
+  
+  Ver que puedes mejorar
