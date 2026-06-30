@@ -20,10 +20,15 @@ public class CubeMovement : MonoBehaviour
         float fraction = Mathf.Clamp01(elapsed / approachTime);
         transform.position = Vector3.Lerp(startPosition, targetPosition, fraction);
 
-        // Opcional: destruir si ya pasó el punto de golpeo y no fue golpeado
+        // El cubo pasÃ³ el punto de golpeo sin ser golpeado: cuenta como fallo (RF-10).
         if (fraction >= 1f)
         {
-            // Aquí podrías llamar a un fallo o simplemente destruir
+            CubeHit hit = GetComponent<CubeHit>();
+            if (hit == null || !hit.resuelto)   // guard: que el sable no lo haya resuelto este frame
+            {
+                if (hit != null) hit.resuelto = true;
+                if (ScoreManager.Instance != null) ScoreManager.Instance.RegistrarFallo();
+            }
             Destroy(gameObject);
         }
     }

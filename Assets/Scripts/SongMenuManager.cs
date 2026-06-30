@@ -13,6 +13,9 @@ public class SongMenuManager : MonoBehaviour
     [Header("Configuración de Escena")]
     public string nombreEscenaJuego = "GameScene";
 
+    [Header("Audio")]
+    public AudioClip sonidoTarjeta;
+
     public static string CancionSeleccionada { get; private set; }
 
     void Start()
@@ -22,13 +25,11 @@ public class SongMenuManager : MonoBehaviour
 
     void GenerarListaCanciones()
     {
-        // 1. Limpiar el contenedor
         foreach (Transform hijo in contenedorBotones)
         {
             Destroy(hijo.gameObject);
         }
 
-        // 2. Ruta real en disco dentro del proyecto
         string rutaCarpeta = Path.Combine(Application.dataPath, "Resources/MusicFiles/ZipFiles");
 
         if (!Directory.Exists(rutaCarpeta))
@@ -37,7 +38,6 @@ public class SongMenuManager : MonoBehaviour
             return;
         }
 
-        // 3. Buscar todos los archivos que terminen estrictamente en .zip
         string[] archivosZip = Directory.GetFiles(rutaCarpeta, "*.zip");
 
         if (archivosZip.Length == 0)
@@ -48,11 +48,7 @@ public class SongMenuManager : MonoBehaviour
 
         foreach (string rutaCompleta in archivosZip)
         {
-            // 4. Leer la metadata del .osu dentro del zip (título, artista, BPM, portada...).
-            //    nombreZip (nombre del archivo sin extensión) sigue siendo la clave de selección.
             SongMetadata datos = OsuZipReader.LeerMetadata(rutaCompleta);
-
-            // 5. Crear la tarjeta/botón
             GameObject nuevoBoton = Instantiate(prefabBoton, contenedorBotones);
 
             SongCardController card = nuevoBoton.GetComponent<SongCardController>();
@@ -62,7 +58,6 @@ public class SongMenuManager : MonoBehaviour
             }
             else
             {
-                // Respaldo heredado: prefab simple con un solo texto.
                 TMP_Text textoBoton = nuevoBoton.GetComponentInChildren<TMP_Text>();
                 if (textoBoton != null)
                 {
@@ -90,6 +85,20 @@ public class SongMenuManager : MonoBehaviour
     {
         CancionSeleccionada = nombre;
         Debug.Log("Canción ZIP seleccionada: " + CancionSeleccionada);
+
+        if (AudioGlobal.instance != null)
+        {
+            if (sonidoTarjeta != null)
+            {
+                AudioGlobal.instance.PlaySFX(sonidoTarjeta);
+            }
+
+            if (AudioGlobal.instance.musicSource != null)
+            {
+                AudioGlobal.instance.musicSource.Stop();
+            }
+        }
+
         SceneManager.LoadScene(nombreEscenaJuego);
     }
 }
