@@ -14,6 +14,9 @@ public class CubeHit : MonoBehaviour
     [Tooltip("Arrastra aquí el SwordsCube_Sliced_Prefab")]
     public GameObject prefabCuboPartido;
 
+    [Tooltip("VFX de impacto (chispazo) que se instancia en el punto de corte, alineado al tajo del sable.")]
+    public GameObject prefabImpactoVFX;
+
     // Ahora recibimos la dirección del tajo del sable
     public void ProcesarGolpe(int tipoSableQueGolpeo, Vector3 direccionCorte)
     {
@@ -44,18 +47,25 @@ public class CubeHit : MonoBehaviour
                     slice.PlayOneShot(slice.clip);
                 }
 
-                // VISUAL (Nivel 2: Alineación por ángulo): genera el cubo partido
-                // orientado hacia la dirección del corte del sable.
+                // VISUAL (Nivel 2: Alineación por ángulo): orientamos los efectos
+                // según la dirección real del tajo del sable.
+                Quaternion rotacionCorte = Quaternion.identity;
+                if (direccionCorte != Vector3.zero)
+                {
+                    rotacionCorte = Quaternion.LookRotation(direccionCorte);
+                }
+
+                // Cubo partido en dos mitades, con la rotación del corte exacta
                 if (prefabCuboPartido != null)
                 {
-                    Quaternion rotacionCorte = Quaternion.identity;
-                    if (direccionCorte != Vector3.zero)
-                    {
-                        rotacionCorte = Quaternion.LookRotation(direccionCorte);
-                    }
-
-                    // Instanciamos el objeto partido con la rotación del corte exacta
                     Instantiate(prefabCuboPartido, transform.position, rotacionCorte);
+                }
+
+                // Chispazo de impacto en el punto exacto del corte
+                if (prefabImpactoVFX != null)
+                {
+                    GameObject vfx = Instantiate(prefabImpactoVFX, transform.position, rotacionCorte);
+                    Destroy(vfx, 2f); // Los VFX de IRONHEAD no se autodestruyen solos
                 }
             }
         }
