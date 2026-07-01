@@ -2,6 +2,13 @@ using UnityEngine;
 
 public class SlicedPart : MonoBehaviour
 {
+    [Header("Dirección del Corte")]
+    [Tooltip("Dirección local en la que esta mitad sale despedida. Al instanciar el prefab, CubeHit ya rota todo el objeto según el tajo real del sable, así que esta dirección queda alineada al plano de corte automáticamente.")]
+    public Vector3 direccionFuerzaLocal = Vector3.right;
+
+    [Tooltip("Dispersión aleatoria (en grados) sobre la dirección del corte, para que cada mitad no salga siempre exactamente igual.")]
+    public float dispersionAngulo = 20f;
+
     [Header("Configuración de Fuerzas")]
     [Tooltip("Fuerza con la que los fragmentos saldrán despedidos hacia afuera. ¡Súbelo para más explosión!")]
     public float fuerzaImpulso = 12f; // Subido de 4 a 12 para un estallido inicial fuerte
@@ -23,14 +30,16 @@ public class SlicedPart : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // Generamos una dirección puramente explosiva en 360 grados
-            Vector3 direccionAleatoria = new Vector3(
-                Random.Range(-1f, 1f), 
-                Random.Range(-0.1f, 0.8f), // Ligero ángulo hacia arriba para la expansión inicial
-                Random.Range(-1f, 1f)
-            ).normalized;
+            // Partimos de la dirección del corte (heredada vía rotación del prefab padre) y le
+            // sumamos una dispersión leve para que no se vea siempre idéntico.
+            Quaternion dispersion = Quaternion.Euler(
+                Random.Range(-dispersionAngulo, dispersionAngulo),
+                Random.Range(-dispersionAngulo, dispersionAngulo),
+                Random.Range(-dispersionAngulo, dispersionAngulo)
+            );
+            Vector3 direccionCorte = transform.TransformDirection((dispersion * direccionFuerzaLocal).normalized);
 
-            rb.AddForce(direccionAleatoria * fuerzaImpulso, ForceMode.Impulse);
+            rb.AddForce(direccionCorte * fuerzaImpulso, ForceMode.Impulse);
 
             Vector3 torqueAleatorio = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f)) * fuerzaTorque;
             rb.AddTorque(torqueAleatorio, ForceMode.Impulse);

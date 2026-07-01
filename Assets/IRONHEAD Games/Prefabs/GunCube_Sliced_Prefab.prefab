@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fe639409707168a4c997613678ae8475, type: 2}
+  - {fileID: 2100000, guid: 92ba2e9b907229b4da4f2d6fde23225c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -144,9 +144,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccfa1733adb36d5478dfbd3271191bf4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   direccionFuerzaLocal: {x: -1, y: 0, z: 0}
+  dispersionAngulo: 20
   fuerzaImpulso: 5
   fuerzaTorque: 10
 --- !u!1 &2279861309793480371
@@ -159,7 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3929823002408315737}
   m_Layer: 0
-  m_Name: SwordsCube_Sliced_Prefab
+  m_Name: GunCube_Sliced_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -246,7 +247,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fe639409707168a4c997613678ae8475, type: 2}
+  - {fileID: 2100000, guid: 92ba2e9b907229b4da4f2d6fde23225c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -326,8 +327,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccfa1733adb36d5478dfbd3271191bf4, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier:
   direccionFuerzaLocal: {x: 1, y: 0, z: 0}
+  dispersionAngulo: 20
   fuerzaImpulso: 5
   fuerzaTorque: 10

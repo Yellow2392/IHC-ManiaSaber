@@ -6,17 +6,19 @@ public class CubeMovement : MonoBehaviour
     [HideInInspector] public Vector3 targetPosition; // punto de golpeo
 
     private Vector3 startPosition;
-    private float spawnTime;
+    private float elapsed;
 
     void Start()
     {
         startPosition = transform.position;
-        spawnTime = Time.time;
+        elapsed = 0f;
     }
 
     void Update()
     {
-        float elapsed = Time.time - spawnTime;
+        // Propio acumulador (en vez de Time.time - spawnTime) para poder frenarlo
+        // brevemente con HitStop sin tocar el reloj global ni desincronizar el audio.
+        elapsed += Time.deltaTime * HitStop.Multiplicador;
         float fraction = Mathf.Clamp01(elapsed / approachTime);
         transform.position = Vector3.Lerp(startPosition, targetPosition, fraction);
 

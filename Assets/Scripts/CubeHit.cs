@@ -14,6 +14,9 @@ public class CubeHit : MonoBehaviour
     [Tooltip("Arrastra aquí el SwordsCube_Sliced_Prefab")]
     public GameObject prefabCuboPartido;
 
+    [Tooltip("VFX de impacto (chispazo, destello, etc.) que se instancian en el punto de corte, alineados al tajo del sable. Se pueden arrastrar varios a la vez.")]
+    public GameObject[] prefabsImpactoVFX;
+
     // Ahora recibimos la dirección del tajo del sable
     public void ProcesarGolpe(int tipoSableQueGolpeo, Vector3 direccionCorte)
     {
@@ -36,6 +39,10 @@ public class CubeHit : MonoBehaviour
                 CalcularPuntaje(diferencia);
                 puntuo = true;
 
+                // 2b. Hit-stop: frena brevemente el avance de los demás cubos para
+                //     darle peso al golpe (no toca Time.timeScale ni el audio).
+                HitStop.Activar(0.04f);
+
                 // 3. Feedback de Audio: Reproduce el sonido de corte
                 AudioSource slice = AudioManager.instance.sliceSound;
                 if (slice != null && slice.clip != null)
@@ -44,18 +51,29 @@ public class CubeHit : MonoBehaviour
                     slice.PlayOneShot(slice.clip);
                 }
 
-                // VISUAL (Nivel 2: Alineación por ángulo): genera el cubo partido
-                // orientado hacia la dirección del corte del sable.
+                // VISUAL (Nivel 2: Alineación por ángulo): orientamos los efectos
+                // según la dirección real del tajo del sable.
+                Quaternion rotacionCorte = Quaternion.identity;
+                if (direccionCorte != Vector3.zero)
+                {
+                    rotacionCorte = Quaternion.LookRotation(direccionCorte);
+                }
+
+                // Cubo partido en dos mitades, con la rotación del corte exacta
                 if (prefabCuboPartido != null)
                 {
-                    Quaternion rotacionCorte = Quaternion.identity;
-                    if (direccionCorte != Vector3.zero)
-                    {
-                        rotacionCorte = Quaternion.LookRotation(direccionCorte);
-                    }
-
-                    // Instanciamos el objeto partido con la rotación del corte exacta
                     Instantiate(prefabCuboPartido, transform.position, rotacionCorte);
+                }
+
+                // VFX de impacto en el punto exacto del corte (chispazo + destello, etc.)
+                if (prefabsImpactoVFX != null)
+                {
+                    foreach (GameObject prefabVFX in prefabsImpactoVFX)
+                    {
+                        if (prefabVFX == null) continue;
+                        GameObject vfx = Instantiate(prefabVFX, transform.position, rotacionCorte);
+                        Destroy(vfx, 2f); // Los VFX de IRONHEAD no se autodestruyen solos
+                    }
                 }
             }
         }
