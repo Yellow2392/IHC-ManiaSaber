@@ -28,6 +28,16 @@ public class CubeSpawnManager : MonoBehaviour
 
 
 
+    [Header("Calibración de Sincronización")]
+    [Tooltip("AudioSource.time reporta la posición que Unity ya procesó, no la que realmente se escucha por el parlante " +
+             "(hay latencia de salida de audio, más el padding de silencio que añaden los encoders MP3 al inicio del clip). " +
+             "Este valor se resta del tiempo de audio para compensar esa diferencia.\n" +
+             "Si el corte se siente ADELANTADO (se corta antes de oír el beat), sube este valor.\n" +
+             "Si se siente ATRASADO, bájalo (puede ser negativo).")]
+    public float offsetSincronizacionAudio = 0.05f;
+
+
+
     public struct NotaOsu
 
     {
@@ -128,7 +138,7 @@ public class CubeSpawnManager : MonoBehaviour
 
             {
 
-                tiempoAudioVirtual = AudioManager.instance.musicTheme.time;
+                tiempoAudioVirtual = AudioManager.instance.musicTheme.time - offsetSincronizacionAudio;
 
             }
 
@@ -522,6 +532,8 @@ public class CubeSpawnManager : MonoBehaviour
             cubeHit.tiempoGolpeExacto = nota.tiempoGolpe;
 
             cubeHit.tipoCuboAsignado = nota.tipoCubo;
+
+            cubeHit.offsetSincronizacionAudio = offsetSincronizacionAudio;
 
         }
 
