@@ -243,9 +243,7 @@ MonoBehaviour:
   margenErrorMaximo: 0.2
   puntajeMaximo: 100
   prefabCuboPartido: {fileID: 2279861309793480371, guid: fc0b9e135aa444c8b31ccd6d110bae60, type: 3}
-  prefabsImpactoVFX:
-  - {fileID: 785496508992942865, guid: c9195fd1af1289d45896d3e553af48d7, type: 3}
-  - {fileID: 6898081380384124788, guid: 28818d55a5cea9244b3739cdbf6a9352, type: 3}
+  prefabsImpactoVFX: []
 --- !u!114 &6254536068099495830
 MonoBehaviour:
   m_ObjectHideFlags: 0
