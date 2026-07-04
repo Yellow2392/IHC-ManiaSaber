@@ -15,13 +15,10 @@ public class GameSceneManager : MonoBehaviour
 
     [Header("Managers")]
     public GameObject cubeSpawnManager;
-    [Tooltip("Gestor de pausa. Se bloquea al terminar la partida para no pausar sobre la pantalla de resultados.")]
     public PauseManager pauseManager;
 
     [Header("Pantallas de Puntaje")]
-    [Tooltip("HUD de puntaje en vivo durante la partida (UI_ScoreCurrent). Se oculta al terminar.")]
     public GameObject hudEnVivo;
-    [Tooltip("Pantalla de resultados (UI_ScoreFinal). Arranca oculta y se muestra al terminar.")]
     public GameObject panelResultados;
 
     private float audioClipLength;
@@ -30,25 +27,19 @@ public class GameSceneManager : MonoBehaviour
     {
         string cancionElegida = SongMenuManager.CancionSeleccionada;
 
-        // Fallback para poder probar directamente en GameScene sin usar el menú
         if (string.IsNullOrEmpty(cancionElegida))
         {
-            cancionElegida = "NOMBRE_DE_TU_ZIP_DE_PRUEBA_AQUI"; // Reemplaza con un nombre de archivo real
-            Debug.LogWarning($"[GameSceneManager] Prueba directa. Usando: {cancionElegida}");
+            cancionElegida = "TuZipDePruebaSinExtension";
+            Debug.LogWarning($"[GameSceneManager] Modo prueba directa en editor/visor. Usando: {cancionElegida}");
         }
-        //AudioManager.instance.Stop();
+
         StartCoroutine(ProcesarZipYJugar(cancionElegida));
     }
 
     IEnumerator ProcesarZipYJugar(string nombreZip)
     {
-        string rutaArchivoZip = Path.Combine(Application.dataPath, $"Resources/MusicFiles/ZipFiles/{nombreZip}.zip");
-
-        if (!File.Exists(rutaArchivoZip))
-        {
-            Debug.LogError($"[GameSceneManager] No se encontró el ZIP en: {rutaArchivoZip}");
-            yield break;
-        }
+        // Ruta compatible con Android StreamingAssets
+        string rutaArchivoZip = $"{Application.streamingAssetsPath}/MusicFiles/ZipFiles/{nombreZip}.zip";
 
         string contenidoOsu = "";
         byte[] audioBytes = null;
@@ -57,47 +48,62 @@ public class GameSceneManager : MonoBehaviour
         string mapaRespaldoTexto = "";
         long menorPesoOsu = long.MaxValue;
 
-        using (FileStream fs = File.OpenRead(rutaArchivoZip))
+        // Descargamos los bytes del ZIP de StreamingAssets de forma segura
+        using (UnityWebRequest zipRequest = UnityWebRequest.Get(rutaArchivoZip))
         {
-            using (ZipArchive zipFile = new ZipArchive(fs, ZipArchiveMode.Read))
+            yield return zipRequest.SendWebRequest();
+
+            if (zipRequest.result != UnityWebRequest.Result.Success)
             {
-                foreach (ZipArchiveEntry entrada in zipFile.Entries)
+                Debug.LogError($"[GameSceneManager] Error al obtener el archivo ZIP: {zipRequest.error}");
+                yield break;
+            }
+
+            byte[] totalZipBytes = zipRequest.downloadHandler.data;
+
+            // Abrimos el zip desde los bytes descargados
+            using (MemoryStream fs = new MemoryStream(totalZipBytes))
+            {
+                using (ZipArchive zipFile = new ZipArchive(fs, ZipArchiveMode.Read))
                 {
-                    if (entrada.FullName.EndsWith("/") || entrada.FullName.EndsWith("\\")) continue;
-
-                    string nombreLimpio = entrada.Name;
-
-                    if (nombreLimpio.EndsWith(".osu", System.StringComparison.OrdinalIgnoreCase))
+                    foreach (ZipArchiveEntry entrada in zipFile.Entries)
                     {
-                        string textoExtraido = "";
-                        using (Stream zipStream = entrada.Open())
-                        using (StreamReader reader = new StreamReader(zipStream, System.Text.Encoding.UTF8))
+                        if (entrada.FullName.EndsWith("/") || entrada.FullName.EndsWith("\\")) continue;
+
+                        string nombreLimpio = entrada.Name;
+
+                        if (nombreLimpio.EndsWith(".osu", System.StringComparison.OrdinalIgnoreCase))
                         {
-                            textoExtraido = reader.ReadToEnd();
+                            string textoExtraido = "";
+                            using (Stream zipStream = entrada.Open())
+                            using (StreamReader reader = new StreamReader(zipStream, System.Text.Encoding.UTF8))
+                            {
+                                textoExtraido = reader.ReadToEnd();
+                            }
+
+                            if (nombreLimpio.ToUpper().Contains("[BEGINNER]")) contenidoOsu = textoExtraido;
+                            else if (entrada.Length < menorPesoOsu && entrada.Length > 0)
+                            {
+                                menorPesoOsu = entrada.Length;
+                                mapaRespaldoTexto = textoExtraido;
+                            }
                         }
 
-                        if (nombreLimpio.ToUpper().Contains("[BEGINNER]")) contenidoOsu = textoExtraido;
-                        else if (entrada.Length < menorPesoOsu && entrada.Length > 0)
+                        string nombreSinExtension = Path.GetFileNameWithoutExtension(nombreLimpio);
+                        string extension = Path.GetExtension(nombreLimpio).ToLower();
+
+                        if (nombreSinExtension.Equals("audio", System.StringComparison.OrdinalIgnoreCase) &&
+                            (extension == ".mp3" || extension == ".ogg"))
                         {
-                            menorPesoOsu = entrada.Length;
-                            mapaRespaldoTexto = textoExtraido;
-                        }
-                    }
+                            nombreArchivoAudio = nombreLimpio;
+                            tipoDeAudio = (extension == ".mp3") ? AudioType.MPEG : AudioType.OGGVORBIS;
 
-                    string nombreSinExtension = Path.GetFileNameWithoutExtension(nombreLimpio);
-                    string extension = Path.GetExtension(nombreLimpio).ToLower();
-
-                    if (nombreSinExtension.Equals("audio", System.StringComparison.OrdinalIgnoreCase) &&
-                        (extension == ".mp3" || extension == ".ogg"))
-                    {
-                        nombreArchivoAudio = nombreLimpio;
-                        tipoDeAudio = (extension == ".mp3") ? AudioType.MPEG : AudioType.OGGVORBIS;
-
-                        using (Stream zipStream = entrada.Open())
-                        using (MemoryStream audioMs = new MemoryStream())
-                        {
-                            zipStream.CopyTo(audioMs);
-                            audioBytes = audioMs.ToArray();
+                            using (Stream zipStream = entrada.Open())
+                            using (MemoryStream audioMs = new MemoryStream())
+                            {
+                                zipStream.CopyTo(audioMs);
+                                audioBytes = audioMs.ToArray();
+                            }
                         }
                     }
                 }
@@ -107,12 +113,13 @@ public class GameSceneManager : MonoBehaviour
         if (string.IsNullOrEmpty(contenidoOsu) && !string.IsNullOrEmpty(mapaRespaldoTexto))
             contenidoOsu = mapaRespaldoTexto;
 
+        // El archivo de audio se debe guardar temporalmente en una zona con permisos de escritura reales de Android
         if (audioBytes != null && tipoDeAudio != AudioType.UNKNOWN)
         {
             string rutaTemporal = Path.Combine(Application.temporaryCachePath, nombreArchivoAudio);
             File.WriteAllBytes(rutaTemporal, audioBytes);
 
-            // CORRECCIÓN: Formato de URI obligatorio para UnityWebRequest local
+            // URI compatible con Android para cargar archivos locales de audio
             string rutaUri = "file:///" + rutaTemporal.Replace("\\", "/");
 
             using (UnityWebRequest multimediaRequest = UnityWebRequestMultimedia.GetAudioClip(rutaUri, tipoDeAudio))
@@ -123,11 +130,13 @@ public class GameSceneManager : MonoBehaviour
                 {
                     AudioClip clipDeMusica = DownloadHandlerAudioClip.GetContent(multimediaRequest);
                     AudioManager.instance.musicTheme.clip = clipDeMusica;
+
+                    // Borramos el temporal inmediatamente para no saturar el almacenamiento de las gafas
                     if (File.Exists(rutaTemporal)) File.Delete(rutaTemporal);
                 }
                 else
                 {
-                    Debug.LogError("[GameSceneManager] Falló carga de audio: " + multimediaRequest.error);
+                    Debug.LogError("[GameSceneManager] Falló carga de audio en Quest 2: " + multimediaRequest.error);
                 }
             }
         }
@@ -168,18 +177,14 @@ public class GameSceneManager : MonoBehaviour
         cubeSpawnManager.SetActive(false);
         timerUI_Gameobject.SetActive(false);
 
-        // Bloquea la pausa: ya no debe poder pausarse sobre la pantalla de resultados.
         if (pauseManager != null) pauseManager.BloquearPausa();
         else if (PauseManager.Instance != null) PauseManager.Instance.BloquearPausa();
 
-        // Cierra el ciclo de puntaje: persiste el récord y pinta finalScoreText /
-        // highScoreText (ya cableados en el ScoreManager de la escena).
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.FinalizarPartida();
         }
 
-        // Cambia del HUD de juego a la pantalla de resultados.
         if (hudEnVivo != null) hudEnVivo.SetActive(false);
         if (panelResultados != null) panelResultados.SetActive(true);
     }
