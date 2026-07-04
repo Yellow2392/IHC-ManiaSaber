@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System.IO;
+using System.Collections;
 using TMPro;
 
 public class SongMenuManager : MonoBehaviour
@@ -20,35 +20,31 @@ public class SongMenuManager : MonoBehaviour
 
     void Start()
     {
-        GenerarListaCanciones();
+        StartCoroutine(GenerarListaCanciones());
     }
 
-    void GenerarListaCanciones()
+    IEnumerator GenerarListaCanciones()
     {
         foreach (Transform hijo in contenedorBotones)
         {
             Destroy(hijo.gameObject);
         }
 
-        string rutaCarpeta = Path.Combine(Application.dataPath, "Resources/MusicFiles/ZipFiles");
+        string[] nombresCanciones = null;
+        yield return SongZipLibrary.ObtenerNombresCanciones(nombres => nombresCanciones = nombres);
 
-        if (!Directory.Exists(rutaCarpeta))
+        if (nombresCanciones == null || nombresCanciones.Length == 0)
         {
-            Debug.LogError($"La carpeta no existe en la ruta: {rutaCarpeta}. Asegúrate de crear las carpetas dentro de Assets.");
-            return;
+            Debug.LogWarning("No se encontró ninguna canción en el manifest de StreamingAssets/MusicFiles/ZipFiles");
+            yield break;
         }
 
-        string[] archivosZip = Directory.GetFiles(rutaCarpeta, "*.zip");
-
-        if (archivosZip.Length == 0)
+        foreach (string nombreCancion in nombresCanciones)
         {
-            Debug.LogWarning("No se encontró ningún archivo .zip en la carpeta MusicFiles/ZipFiles");
-            return;
-        }
+            byte[] datosZip = null;
+            yield return SongZipLibrary.ObtenerBytesDeCancion(nombreCancion, bytes => datosZip = bytes);
 
-        foreach (string rutaCompleta in archivosZip)
-        {
-            SongMetadata datos = OsuZipReader.LeerMetadata(rutaCompleta);
+            SongMetadata datos = OsuZipReader.LeerMetadata(datosZip, nombreCancion);
             GameObject nuevoBoton = Instantiate(prefabBoton, contenedorBotones);
 
             SongCardController card = nuevoBoton.GetComponent<SongCardController>();

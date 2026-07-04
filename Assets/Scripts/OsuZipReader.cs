@@ -6,16 +6,17 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// Lee la metadata de una canción directamente desde su .zip (paquete estilo .osz)
-/// sin extraerlo a disco. Nunca lanza excepciones al llamador: ante cualquier
-/// problema devuelve una metadata de respaldo con el nombre del archivo.
+/// Lee la metadata de una canción directamente desde los bytes de su .zip (paquete
+/// estilo .osz) sin escribir nada a disco. Recibe bytes en lugar de una ruta porque
+/// en Android el .zip vive dentro de StreamingAssets y solo se puede leer con
+/// UnityWebRequest (ver SongZipLibrary), no con System.IO. Nunca lanza excepciones
+/// al llamador: ante cualquier problema devuelve una metadata de respaldo con el
+/// nombre de la canción.
 /// </summary>
 public static class OsuZipReader
 {
-    public static SongMetadata LeerMetadata(string rutaZip)
+    public static SongMetadata LeerMetadata(byte[] datosZip, string nombreZip)
     {
-        string nombreZip = Path.GetFileNameWithoutExtension(rutaZip);
-
         // Metadata de respaldo: se devuelve si algo falla.
         SongMetadata datos = new SongMetadata
         {
@@ -28,9 +29,13 @@ public static class OsuZipReader
             portada = null
         };
 
+        if (datosZip == null)
+            return datos;
+
         try
         {
-            using (ZipArchive zip = ZipFile.OpenRead(rutaZip))
+            using (MemoryStream memoria = new MemoryStream(datosZip))
+            using (ZipArchive zip = new ZipArchive(memoria, ZipArchiveMode.Read))
             {
                 // 1. Elegir el MISMO .osu que jugará GameSceneManager:
                 //    prioriza la dificultad [BEGINNER]; si no existe, el .osu más pequeño.
@@ -63,7 +68,7 @@ public static class OsuZipReader
 
                 if (entradaOsu == null)
                 {
-                    Debug.LogWarning($"OsuZipReader: no se encontró ningún archivo .osu dentro de '{rutaZip}'.");
+                    Debug.LogWarning($"OsuZipReader: no se encontró ningún archivo .osu dentro de '{nombreZip}'.");
                     return datos;
                 }
 
@@ -217,19 +222,19 @@ public static class OsuZipReader
                         else
                         {
                             UnityEngine.Object.Destroy(textura);
-                            Debug.LogWarning($"OsuZipReader: no se pudo decodificar la imagen '{archivoFondo}' de '{rutaZip}'.");
+                            Debug.LogWarning($"OsuZipReader: no se pudo decodificar la imagen '{archivoFondo}' de '{nombreZip}'.");
                         }
                     }
                     else
                     {
-                        Debug.LogWarning($"OsuZipReader: el fondo '{archivoFondo}' no existe dentro de '{rutaZip}'.");
+                        Debug.LogWarning($"OsuZipReader: el fondo '{archivoFondo}' no existe dentro de '{nombreZip}'.");
                     }
                 }
             }
         }
         catch (Exception excepcion)
         {
-            Debug.LogWarning($"OsuZipReader: error leyendo '{rutaZip}': {excepcion.Message}");
+            Debug.LogWarning($"OsuZipReader: error leyendo '{nombreZip}': {excepcion.Message}");
         }
 
         return datos;

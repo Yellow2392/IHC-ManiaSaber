@@ -42,11 +42,12 @@ public class GameSceneManager : MonoBehaviour
 
     IEnumerator ProcesarZipYJugar(string nombreZip)
     {
-        string rutaArchivoZip = Path.Combine(Application.dataPath, $"Resources/MusicFiles/ZipFiles/{nombreZip}.zip");
+        byte[] datosZip = null;
+        yield return SongZipLibrary.ObtenerBytesDeCancion(nombreZip, bytes => datosZip = bytes);
 
-        if (!File.Exists(rutaArchivoZip))
+        if (datosZip == null)
         {
-            Debug.LogError($"[GameSceneManager] No se encontró el ZIP en: {rutaArchivoZip}");
+            Debug.LogError($"[GameSceneManager] No se pudo cargar el ZIP de la canción: {nombreZip}");
             yield break;
         }
 
@@ -57,9 +58,9 @@ public class GameSceneManager : MonoBehaviour
         string mapaRespaldoTexto = "";
         long menorPesoOsu = long.MaxValue;
 
-        using (FileStream fs = File.OpenRead(rutaArchivoZip))
+        using (MemoryStream ms = new MemoryStream(datosZip))
         {
-            using (ZipArchive zipFile = new ZipArchive(fs, ZipArchiveMode.Read))
+            using (ZipArchive zipFile = new ZipArchive(ms, ZipArchiveMode.Read))
             {
                 foreach (ZipArchiveEntry entrada in zipFile.Entries)
                 {
