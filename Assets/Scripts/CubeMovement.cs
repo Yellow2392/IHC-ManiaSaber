@@ -7,6 +7,7 @@ public class CubeMovement : MonoBehaviour
 
     private Vector3 startPosition;
     private float elapsed;
+    private float congeladoHasta = -1f; // Time.unscaledTime hasta el cual ESTE cubo no avanza
 
     void Start()
     {
@@ -14,11 +15,19 @@ public class CubeMovement : MonoBehaviour
         elapsed = 0f;
     }
 
+    // Congela brevemente el avance de este cubo (p.ej. al ser golpeado) sin afectar
+    // al resto de cubos en vuelo ni al reloj de audio.
+    public void Congelar(float duracionSegundos)
+    {
+        float fin = Time.unscaledTime + duracionSegundos;
+        if (fin > congeladoHasta) congeladoHasta = fin;
+    }
+
     void Update()
     {
-        // Propio acumulador (en vez de Time.time - spawnTime) para poder frenarlo
-        // brevemente con HitStop sin tocar el reloj global ni desincronizar el audio.
-        elapsed += Time.deltaTime * HitStop.Multiplicador;
+        if (Time.unscaledTime >= congeladoHasta)
+            elapsed += Time.deltaTime;
+
         float fraction = Mathf.Clamp01(elapsed / approachTime);
         transform.position = Vector3.Lerp(startPosition, targetPosition, fraction);
 
