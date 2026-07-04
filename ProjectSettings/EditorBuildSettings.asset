@@ -5,12 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 0
-    path: Assets/Scenes/OVRCameraRigScene.unity
-    guid: 9e5ed350ff321a746b18ee8dae2d1117
   - enabled: 1
     path: Assets/Scenes/MenuPrincipal.unity
     guid: aca63f1c00c64c2479a5829ce51dc40f
