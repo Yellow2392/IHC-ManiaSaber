@@ -100,7 +100,7 @@ public class ScoreManager : MonoBehaviour
 
         if (aciertosFallosText != null)
         {
-            aciertosFallosText.text = "Aciertos: " + aciertos + "   Fallos: " + fallos;
+            aciertosFallosText.text = "Perfect: " + aciertos + "   Failed: " + fallos;
         }
     }
 }
