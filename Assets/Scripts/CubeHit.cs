@@ -39,9 +39,10 @@ public class CubeHit : MonoBehaviour
                 CalcularPuntaje(diferencia);
                 puntuo = true;
 
-                // 2b. Hit-stop: frena brevemente el avance de los demás cubos para
-                //     darle peso al golpe (no toca Time.timeScale ni el audio).
-                HitStop.Activar(0.04f);
+                // 2b. Hit-stop: frena brevemente el avance de ESTE cubo (no del resto)
+                //     para darle peso al golpe, sin desincronizar a los demás con el audio.
+                CubeMovement movimiento = GetComponent<CubeMovement>();
+                if (movimiento != null) movimiento.Congelar(0.04f);
 
                 // 3. Feedback de Audio: Reproduce el sonido de corte
                 AudioSource slice = AudioManager.instance.sliceSound;
