@@ -5,6 +5,7 @@ public class CubeHit : MonoBehaviour
     [HideInInspector] public float tiempoGolpeExacto; // Asignado por CubeSpawnManager
     [HideInInspector] public int tipoCuboAsignado;    // 0 para A, 1 para B
     [HideInInspector] public bool resuelto = false;   // Evita doble conteo (golpe vs expiración en el mismo frame)
+    [HideInInspector] public float offsetSincronizacionAudio; // Mismo offset que usó el spawn para este cubo (CubeSpawnManager)
 
     [Header("Configuración de Golpe")]
     public float margenErrorMaximo = 0.2f;
@@ -31,7 +32,7 @@ public class CubeHit : MonoBehaviour
         if (tipoSableQueGolpeo == tipoCuboAsignado
             && AudioManager.instance != null && AudioManager.instance.musicTheme != null)
         {
-            float tiempoActual = AudioManager.instance.musicTheme.time;
+            float tiempoActual = AudioManager.instance.musicTheme.time - offsetSincronizacionAudio;
             float diferencia = Mathf.Abs(tiempoGolpeExacto - tiempoActual);
 
             if (diferencia <= margenErrorMaximo)
